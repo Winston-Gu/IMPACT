@@ -19,6 +19,7 @@
   <div class="page-bg"></div>
 
   <main class="shell">
+    <section class="first-screen">
     <section class="hero card reveal">
       <video class="hero-video" playsinline autoplay muted loop>
         <source src="./resources/IMPACT_Teaser_NoText.web.mp4" type="video/mp4">
@@ -54,21 +55,70 @@
           <span class="author-block"><sup>3</sup> <img class="affiliation-icon" src="./static/images/tsinghua-icon.svg" alt="Tsinghua"> Tsinghua University</span>
         </div>
       </div>
+      <div class="scroll-cue" aria-hidden="true">
+        <span class="mono-link-text">Scroll</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
     </section>
 
-    <section class="grid reveal">
-      <article class="info-card">
-        <h3>What Is New</h3>
-        <p>IMPACT learns internal-model predictive control policies tailored for high-force, contact-rich manipulation.</p>
-      </article>
-      <article class="info-card">
-        <h3>Why It Matters</h3>
-        <p>Forceful tasks are common in real robotics but hard to solve with purely reactive control and imitation pipelines.</p>
-      </article>
-      <article class="info-card">
-        <h3>Current Status</h3>
-        <p>Project page is live with teaser video and paper/video links. Code release is being prepared.</p>
-      </article>
+    <section class="briefing reveal">
+      <div class="briefing-head">
+        <p class="mono-link-text">At A Glance</p>
+      </div>
+      <div class="briefing-grid">
+        <article class="briefing-item">
+          <h3>What Is New</h3>
+          <p>We introduce <strong>IMPACT</strong>, a framework designed for forceful robotic manipulation tasks. 
+            By learning an internal model of environment dynamics and contact interactions <em>online</em>, IMPACT utilizes feedforward control alongside an imitation learning policy. 
+            This architecture is directly inspired by—and closely parallels—the mechanisms found in the human cerebellum.</p>
+        </article>
+        
+        <article class="briefing-item">
+          <h3>Why It Matters</h3>
+          <p>Everyday household tasks often involve significant interaction forces. 
+            To finish the tasks successfully, imitation learning policies must adapt to varying contact dynamics—such as adjusting vertical lift force to compensate for an object's weight. 
+            Our research shows that vanilla imitation learning with impedance control fails to generalize to these gravitational loads, leading to task failure even as training data scales.</p>
+        </article>
+        <article class="briefing-item">
+          <h3>Takeaway Messages</h3>
+          <p>Simply scaling up data within a vanilla imitation learning framework is <em>insufficient</em> for tasks requiring sustained contact and force modulation. 
+            <strong>IMPACT</strong> provides a robust alternative, serving as a specialized framework for complex, force-sensitive manipulation tasks where traditional methods struggle to adapt and generalize..</p>
+        </article>
+      </div>
+    </section>
+    </section>
+
+    <section class="overview-section reveal">
+      <h1>Overview</h1>
+      <p class="overview-intro">This section summarizes the technical design and the resulting performance of IMPACT through concise descriptions and embedded documents.</p>
+
+      <div class="overview-block">
+        <h2>Methods</h2>
+        <p>IMPACT combines an imitation learning policy with an online-updated internal model of contact dynamics. The internal model provides feedforward control adjustments that improve force adaptation and stability under varying object loads.</p>
+        <figure class="overview-figure">
+          <img src="./resources/Methods.svg" alt="IMPACT methods figure">
+          <figcaption>Fig 1. Method overview and architecture.</figcaption>
+        </figure>
+      </div>
+
+      <div class="overview-block">
+        <h2>Results</h2>
+        <p>The results highlight stronger robustness in force-sensitive scenarios where vanilla imitation learning with impedance control struggles. IMPACT maintains better task completion under shifts in interaction force and gravitational load.</p>
+        <figure class="overview-figure">
+          <img src="./resources/SR_3d.svg" alt="IMPACT results figure">
+          <figcaption>Fig 2. Results and qualitative analysis.</figcaption>
+        </figure>
+
+        <div class="overview-split">
+          <div class="overview-split-text">
+            <p>The control diagram.</p>
+          </div>
+          <figure class="overview-figure overview-figure-half">
+            <img src="./resources/Diagram.svg" alt="IMPACT analysis diagram">
+            <figcaption>Fig 3. Diagram of interaction behavior and control response.</figcaption>
+          </figure>
+        </div>
+      </div>
     </section>
   </main>
 
