@@ -90,26 +90,25 @@
 
     <section class="overview-section reveal">
       <h1>Overview</h1>
-      <p class="overview-intro">This section summarizes the technical design and the resulting performance of IMPACT through concise descriptions and embedded documents.</p>
 
       <div class="overview-block">
         <h2>Methods</h2>
-        <p>IMPACT combines an imitation learning policy with an online-updated internal model of contact dynamics. The internal model provides feedforward control adjustments that improve force adaptation and stability under varying object loads.</p>
+        <p class="overview-center-copy">
+          The core idea of <strong>IMPACT</strong> is to combine an imitation learning policy with an online-updated internal model of environment dynamics and contact forces. 
+          Consider the case when we want the robots to handle objects of varying weights. 
+          To compensate for the object gravity, the policy will need to learn to overshoot in z direction during the lift phase, as illustrated in Fig 1. 
+          Experiments shows that this vanilla appraoch fail to adapt and achieve successful task completion, even with more training data.
+        </p>
+        <p class="overview-center-copy">
+          In contrast, we propose to decouple 
+        </p>
         <figure class="overview-figure">
           <img src="./resources/Methods.svg" alt="IMPACT methods figure">
-          <figcaption>Fig 1. Method overview and architecture.</figcaption>
+          <figcaption>Fig 1. Overview of IMPACT and comparison with implicit force control method. (a) In implicit force control, forces are generated implicitly by the policy through producing virtual target trajectories that induce tracking errors, which are converted into interaction forces by a low-level impedance controller. (b) In IMPACT, the controller generates desired interaction forces: an internal model predicts contact and payload-induced forces and compensates via feedforward torque commands. </figcaption>
         </figure>
       </div>
 
-      <div class="overview-block">
-        <h2>Results</h2>
-        <p>The results highlight stronger robustness in force-sensitive scenarios where vanilla imitation learning with impedance control struggles. IMPACT maintains better task completion under shifts in interaction force and gravitational load.</p>
-        <figure class="overview-figure">
-          <img src="./resources/SR_3d.svg" alt="IMPACT results figure">
-          <figcaption>Fig 2. Results and qualitative analysis.</figcaption>
-        </figure>
-
-        <div class="overview-split">
+      <div class="overview-split">
           <div class="overview-split-text">
             <p>The control diagram.</p>
           </div>
@@ -118,6 +117,84 @@
             <figcaption>Fig 3. Diagram of interaction behavior and control response.</figcaption>
           </figure>
         </div>
+
+      <div class="overview-block">
+        <h2>Results</h2>
+        <p class="overview-center-copy">The results highlight stronger robustness in force-sensitive scenarios where vanilla imitation learning with impedance control struggles. IMPACT maintains better task completion under shifts in interaction force and gravitational load.</p>
+        <figure class="overview-figure">
+          <img src="./resources/SR_3d.svg" alt="IMPACT results figure">
+          <figcaption>Fig 2. Results and qualitative analysis.</figcaption>
+        </figure>
+
+        <div class="results-demos">
+          <article class="result-demo card">
+            <h3>IMPACT Generalize</h3>
+            <video controls playsinline preload="metadata">
+              <source src="./resources/IMPACT Generalize.web.mp4" type="video/mp4">
+            </video>
+          </article>
+          <article class="result-demo card">
+            <h3>Safe</h3>
+            <video controls playsinline preload="metadata">
+              <source src="./resources/Safe.web.mp4" type="video/mp4">
+            </video>
+          </article>
+          <article class="result-demo result-demo-portrait card">
+            <h3>Calligraphy Large</h3>
+            <video controls playsinline preload="metadata">
+              <source src="./resources/Caliggraphy_Large.web.mp4" type="video/mp4">
+            </video>
+          </article>
+          <article class="result-demo result-demo-portrait card">
+            <h3>Calligraphy Small</h3>
+            <video controls playsinline preload="metadata">
+              <source src="./resources/Caliggraphy_Small.web.mp4" type="video/mp4">
+            </video>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="demos-section reveal">
+      <h1>Demos</h1>
+      <p class="demos-intro">Compressed web-ready demos for fast loading and playback.</p>
+      <div class="demos-grid">
+        <article class="demo-card card">
+          <h3>Baseline Light</h3>
+          <video controls playsinline preload="metadata">
+            <source src="./resources/Baseline Light.web.mp4" type="video/mp4">
+          </video>
+        </article>
+        <article class="demo-card card">
+          <h3>Baseline Heavy</h3>
+          <video controls playsinline preload="metadata">
+            <source src="./resources/Basline Heavy.web.mp4" type="video/mp4">
+          </video>
+        </article>
+        <article class="demo-card card">
+          <h3>Dumbbell Baseline</h3>
+          <video controls playsinline preload="metadata">
+            <source src="./resources/Dumbell Baseline.web.mp4" type="video/mp4">
+          </video>
+        </article>
+        <article class="demo-card card">
+          <h3>Controller Baseline</h3>
+          <video controls playsinline preload="metadata">
+            <source src="./resources/Controller Baseline.web.mp4" type="video/mp4">
+          </video>
+        </article>
+        <article class="demo-card card">
+          <h3>Controller Adapt</h3>
+          <video controls playsinline preload="metadata">
+            <source src="./resources/Controller Adapt.web.mp4" type="video/mp4">
+          </video>
+        </article>
+        <article class="demo-card card">
+          <h3>Controller Teleop</h3>
+          <video controls playsinline preload="metadata">
+            <source src="./resources/Controller Teleop.web.mp4" type="video/mp4">
+          </video>
+        </article>
       </div>
     </section>
   </main>

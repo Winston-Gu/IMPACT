@@ -1,10 +1,10 @@
 :root {
-  --paper: #f6f2e8;
-  --paper-soft: #fbf8f1;
-  --ink: #141414;
-  --ink-soft: #434038;
-  --rule: #b8b09f;
-  --accent: #7d1212;
+  --paper: #f8f7f3;
+  --paper-soft: #fdfcf8;
+  --ink: #111111;
+  --ink-soft: #2d2d2d;
+  --rule: #161616;
+  --accent: #111111;
 }
 
 * {
@@ -22,9 +22,8 @@ body {
   color: var(--ink);
   background-color: var(--paper);
   background-image:
-    radial-gradient(circle at 18% 14%, rgba(255, 255, 255, 0.68), transparent 42%),
-    radial-gradient(circle at 82% 86%, rgba(173, 152, 117, 0.08), transparent 44%),
-    linear-gradient(180deg, #f7f3ea 0%, #f2ecdf 100%);
+    radial-gradient(circle at 18% 14%, rgba(255, 255, 255, 0.56), transparent 42%),
+    linear-gradient(180deg, #fbfaf6 0%, #f4f2eb 100%);
   min-height: 100vh;
 }
 
@@ -48,8 +47,8 @@ body {
       transparent 4px
     ),
     radial-gradient(circle at 40% 35%, rgba(0, 0, 0, 0.035), transparent 60%);
-  opacity: 0.6;
-  mix-blend-mode: multiply;
+  opacity: 0.24;
+  mix-blend-mode: normal;
   z-index: -1;
 }
 
@@ -69,10 +68,10 @@ main.shell {
 }
 
 .card {
-  border: 1px solid var(--rule);
-  border-radius: 3px;
+  border: 1px solid rgba(22, 22, 22, 0.34);
+  border-radius: 0;
   overflow: hidden;
-  background: var(--paper-soft);
+  background: #fbfaf5;
 }
 
 .hero {
@@ -132,20 +131,23 @@ main.shell {
 .title {
   margin: 0;
   font-family: "Cormorant Garamond", "Times New Roman", serif;
-  font-weight: 500;
+  font-weight: 600;
   font-size: clamp(3.1rem, 11vw, 9.2rem);
-  line-height: 0.88;
-  letter-spacing: 0.05em;
+  line-height: 0.9;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
 }
 
 .subtitle {
   margin: 0.72rem 0 0;
   max-width: 740px;
-  font-family: "Cormorant Garamond", "Times New Roman", serif;
-  font-weight: 500;
-  font-size: clamp(1.25rem, 2.2vw, 2.08rem);
-  line-height: 1.24;
+  font-family: "Libre Baskerville", Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.06rem, 1.55vw, 1.45rem);
+  line-height: 1.45;
+  letter-spacing: 0.01em;
 }
 
 .cta-row {
@@ -250,7 +252,7 @@ main.shell {
   margin: 0 0 0.5rem;
   font-family: "Cormorant Garamond", "Times New Roman", serif;
   font-weight: 600;
-  font-size: 1.2rem;
+  font-size: 1.28rem;
   color: var(--ink);
   min-height: 1.5em;
 }
@@ -258,8 +260,8 @@ main.shell {
 .briefing-item p {
   margin: 0;
   color: var(--ink-soft);
-  line-height: 1.45;
-  font-size: 0.87rem;
+  line-height: 1.7;
+  font-size: 0.97rem;
   flex: 1;
 }
 
@@ -290,23 +292,38 @@ main.shell {
 .overview-block h2 {
   margin: 0;
   font-family: "Cormorant Garamond", "Times New Roman", serif;
-  font-size: 1.75rem;
+  font-size: 1.86rem;
   font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .overview-block p {
   margin: 0.45rem 0 0.75rem;
   color: var(--ink-soft);
-  line-height: 1.62;
-  font-size: 0.95rem;
+  line-height: 1.75;
+  font-size: 1rem;
   max-width: 1420px;
+}
+
+.overview-section h1,
+.demos-section h1,
+.overview-section .overview-block h2,
+.demos-section .demos-intro,
+.overview-section .overview-center-copy,
+.results-demos,
+.demos-grid,
+.overview-split {
+  max-width: 78ch;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .overview-figure {
   margin: 0;
-  border: 0;
-  background: transparent;
-  padding: 0;
+  border-top: 1px solid rgba(17, 17, 17, 0.38);
+  border-bottom: 1px solid rgba(17, 17, 17, 0.38);
+  background: #fcfbf6;
+  padding: 0.55rem 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -316,21 +333,24 @@ main.shell {
   display: block;
   width: min(100%, 700px);
   height: auto;
-  background: transparent;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.35);
 }
 
 .overview-figure figcaption {
-  margin-top: 0.42rem;
+  margin-top: 0.55rem;
   width: min(100%, 700px);
-  font-size: 0.86rem;
-  color: #5a554a;
-  font-style: italic;
+  font-size: 0.8rem;
+  color: #33312c;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
 }
 
 .overview-split {
   margin-top: 1rem;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 7fr 3fr;
   gap: 1rem;
   align-items: start;
 }
@@ -338,8 +358,8 @@ main.shell {
 .overview-split-text p {
   margin: 0 0 0.7rem;
   color: var(--ink-soft);
-  line-height: 1.62;
-  font-size: 0.93rem;
+  line-height: 1.72;
+  font-size: 0.98rem;
 }
 
 .overview-split-text p:last-child {
@@ -357,6 +377,86 @@ main.shell {
 
 .overview-figure-half figcaption {
   width: 100%;
+}
+
+.results-demos {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.result-demo {
+  padding: 0.35rem;
+}
+
+.result-demo h3 {
+  margin: 0 0 0.2rem;
+  font-family: "Cormorant Garamond", "Times New Roman", serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.result-demo video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #111;
+  border: 1px solid rgba(17, 17, 17, 0.45);
+}
+
+.result-demo-portrait video {
+  aspect-ratio: 9 / 16;
+}
+
+.result-demo-portrait {
+  width: 50%;
+  margin: 0 auto;
+}
+
+.demos-section {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+}
+
+.demos-section h1 {
+  margin: 0;
+  font-family: "Cormorant Garamond", "Times New Roman", serif;
+  font-size: 2.25rem;
+  font-weight: 600;
+}
+
+.demos-intro {
+  margin: 0.45rem 0 1rem;
+  color: var(--ink-soft);
+}
+
+.demos-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.demo-card {
+  padding: 0.8rem;
+}
+
+.demo-card h3 {
+  margin: 0 0 0.5rem;
+  font-family: "Cormorant Garamond", "Times New Roman", serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.demo-card video {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #111;
+  border: 1px solid rgba(17, 17, 17, 0.45);
 }
 
 .footer {
@@ -377,9 +477,10 @@ main.shell {
 }
 
 .mono-link-text {
-  font-family: "IBM Plex Mono", "Courier New", monospace;
+  font-family: "Libre Baskerville", Georgia, serif;
   font-size: 0.88rem;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .reveal {
@@ -438,6 +539,18 @@ main.shell {
   }
 
   .overview-split {
+    grid-template-columns: 1fr;
+  }
+
+  .results-demos {
+    grid-template-columns: 1fr;
+  }
+
+  .result-demo-portrait {
+    width: 100%;
+  }
+
+  .demos-grid {
     grid-template-columns: 1fr;
   }
 
