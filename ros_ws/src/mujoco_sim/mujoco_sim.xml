@@ -1,0 +1,9 @@
+<library path="mujoco_sim">
+  <class name="mujoco_sim/Simulator"
+         type="mujoco_sim::Simulator"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Mujoco system interface
+      </description>
+  </class>
+</library>

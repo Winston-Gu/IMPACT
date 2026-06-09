@@ -1,0 +1,10 @@
+
+use_wandb: true
+wandb:
+  project: impact-real
+  entity: null
+  group: null
+  mode: online
+  sync_tensorboard: false
+enable_tensorboard: true
+tensorboard_dir: ${hydra:run.dir}/tb

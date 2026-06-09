@@ -1,0 +1,9 @@
+/**:
+  gravity_compensation:
+    ros__parameters:
+      use_gravity_compensation: true
+
+  cartesian_impedance_controller:
+    ros__parameters:
+      use_gravity_compensation: true
+      limit_error: false

@@ -1,0 +1,18 @@
+/**:
+  ros__parameters:
+    device: "cuda:0"
+    control_rate: 10.0
+    n_obs_steps: 8 # Remember to keep consistent.
+    resize_height: 256
+    resize_width: 256
+    use_compressed: true
+    max_translation_speed: 0.0
+    action_is_delta: true
+    front_camera_topic: "/camera/front_camera/color/image_rect_raw"
+    side_camera_topic: "/camera/side_camera/color/image_rect_raw"
+    current_pose_topic: "/fr3_right/current_pose"
+    joint_state_topic: "/fr3_right/franka/joint_states"
+    gripper_state_topic: "/fr3_right/gripper/joint_states"
+    target_pose_topic: "/fr3_right/target_pose"
+    gripper_command_topic: "/fr3_right/gripper/gripper_position_controller/commands"
+    command_frame: "fr3_link0"

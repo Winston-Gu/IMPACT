@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Dataset Viewer</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Palatino, sans-serif; margin: 0; padding: 0; background: #111; color: #f3f3f3; }
+    header { background: #1d1d1d; padding: 12px 24px; }
+    header h1 { margin: 0; font-size: 1.2rem; }
+    main { padding: 16px 24px; }
+    section { margin-bottom: 24px; }
+    label { margin-right: 8px; }
+    .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .controls button { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; }
+    .controls input[type=range] { flex: 1; }
+    .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 16px; }
+    .chart-card { background: #1d1d1d; padding: 12px 16px; border-radius: 6px; }
+    .chart-card.full-row { grid-column: 1 / -1; }
+    .chart-card h2 { margin: 0 0 8px 0; font-size: 1.05rem; }
+    canvas { width: 100%; height: 240px; }
+    .chart-card.full-row canvas#timestampChart { height: 300px !important; max-height: 300px; }
+    .chart-card.full-row canvas#valuePoseChart,
+    .chart-card.full-row canvas#valueGripperChart { height: 240px !important; max-height: 240px; }
+    .inline-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+    .inline-controls label { font-size: 0.95rem; }
+    .inline-controls input { width: 120px; padding: 4px 6px; background: #0f0f0f; border: 1px solid #333; color: #f3f3f3; border-radius: 4px; }
+    .inline-controls button { padding: 6px 10px; border: none; border-radius: 4px; background: #2b7bdc; color: white; cursor: pointer; }
+    .inline-controls button:hover { background: #3c8bf0; }
+    .images { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
+    .camera-card { background: #1d1d1d; padding: 12px; border-radius: 6px; width: 360px; }
+    .camera-card img { width: 100%; height: auto; display: block; border-radius: 4px; background: #000; }
+    .status { font-size: 0.9rem; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dataset Viewer</h1>
+  </header>
+  <main>
+    <section class="controls">
+      <label for="episodeSelect">Episode:</label>
+      <select id="episodeSelect"></select>
+      <button id="loadButton">Load</button>
+      <button id="playButton">Play</button>
+      <button id="pauseButton">Pause</button>
+      <label for="playFps">FPS:</label>
+      <input id="playFps" type="number" min="1" max="120" step="1" value="10" style="width:70px;">
+      <input type="range" id="frameSlider" min="0" max="0" value="0">
+      <span id="frameLabel">Frame 0 / 0</span>
+      <span id="playbackLabel">t = 0.00 s</span>
+      <span id="clockLabel"></span>
+    </section>
+    <section>
+      <div id="status" class="status"></div>
+    </section>
+    <section class="images-section">
+      <h2>Camera Views</h2>
+      <div class="images" id="images"></div>
+    </section>
+    <div class="charts">
+      <section class="chart-card">
+        <h2>End Effector Position</h2>
+        <div id="poseStatus" class="status"></div>
+        <canvas id="positionChart"></canvas>
+      </section>
+      <section class="chart-card">
+        <h2>Joint Angles</h2>
+        <div id="jointSeriesStatus" class="status"></div>
+        <canvas id="jointChart"></canvas>
+      </section>
+      <section class="chart-card">
+        <h2>Gripper Position</h2>
+        <div id="gripperStatus" class="status"></div>
+        <canvas id="gripperChart"></canvas>
+      </section>
+      <section class="chart-card full-row">
+        <h2>Channel Timestamps</h2>
+        <div class="inline-controls">
+          <label for="timestampStart">Start (s):</label>
+          <input id="timestampStart" type="number" step="0.01" placeholder="e.g. 0.0" value="0">
+          <label for="timestampEnd">End (s):</label>
+          <input id="timestampEnd" type="number" step="0.01" placeholder="e.g. 5.0" value="5">
+          <button id="timestampApply">Show Range</button>
+        </div>
+        <div id="timestampStatus" class="status">Enter start/end (seconds from episode start) to plot.</div>
+        <canvas id="timestampChart"></canvas>
+      </section>
+      <section class="chart-card full-row">
+        <h2>Value Slice (Index Range)</h2>
+        <div class="inline-controls">
+          <label for="valueStart">Start idx:</label>
+          <input id="valueStart" type="number" step="1" min="0" value="0" style="width:80px;">
+          <label for="valueEnd">End idx:</label>
+          <input id="valueEnd" type="number" step="1" min="0" value="50" style="width:80px;">
+          <button id="valueApply">Show Range</button>
+        </div>
+        <div id="valueStatus" class="status">Enter start/end frame indices to plot pose/gripper values on the aligned grid.</div>
+        <canvas id="valuePoseChart"></canvas>
+        <canvas id="valueGripperChart"></canvas>
+      </section>
+    </div>
+  </main>
+  <script>
+    const episodeSelect = document.getElementById('episodeSelect');
+    const loadButton = document.getElementById('loadButton');
+    const playButton = document.getElementById('playButton');
+    const pauseButton = document.getElementById('pauseButton');
+    const playFps = document.getElementById('playFps');
+    const frameSlider = document.getElementById('frameSlider');
+    const frameLabel = document.getElementById('frameLabel');
+    const statusBox = document.getElementById('status');
+    const playbackLabel = document.getElementById('playbackLabel');
+    const clockLabel = document.getElementById('clockLabel');
+    const imagesContainer = document.getElementById('images');
+    const poseStatus = document.getElementById('poseStatus');
+    const poseCanvas = document.getElementById('positionChart');
+    const timestampStatus = document.getElementById('timestampStatus');
+    const timestampCanvas = document.getElementById('timestampChart');
+    const timestampStart = document.getElementById('timestampStart');
+    const timestampEnd = document.getElementById('timestampEnd');
+    const timestampApply = document.getElementById('timestampApply');
+    const jointSeriesStatus = document.getElementById('jointSeriesStatus');
+    const jointCanvas = document.getElementById('jointChart');
+    const gripperStatus = document.getElementById('gripperStatus');
+    const gripperCanvas = document.getElementById('gripperChart');
+    const valueStart = document.getElementById('valueStart');
+    const valueEnd = document.getElementById('valueEnd');
+    const valueApply = document.getElementById('valueApply');
+    const valueStatus = document.getElementById('valueStatus');
+    const valuePoseCanvas = document.getElementById('valuePoseChart');
+    const valueGripperCanvas = document.getElementById('valueGripperChart');
+    let currentEpisode = null;
+    let frameCount = 0;
+    let cameras = [];
+    let playTimer = null;
+    let episodeStartSec = 0;
+    let poseChart = null;
+    let timestampChart = null;
+    let jointChart = null;
+    let gripperChart = null;
+    const robotJointColors = ['#ff6b6b', '#ffa94d', '#ffd43b', '#69db7c', '#38d9a9', '#4dabf7', '#9775fa'];
+    const gripperJointColors = ['#4dabf7', '#f783ac'];
+    let currentPlaybackTime = 0;
+    let cachedPoseSeries = null;
+    let cachedJointSeries = null;
+    let valuePoseChart = null;
+    let valueGripperChart = null;
+    const timeCursorPlugin = {
+      id: 'timeCursor',
+      afterDatasetsDraw(chart, args, opts) {
+        if (!chart || typeof currentPlaybackTime !== 'number') return;
+        const origin = chart.$timeOriginSec ?? 0;
+        const cursorValue = currentPlaybackTime - origin;
+        if (!isFinite(cursorValue)) return;
+        const xScale = chart.scales.x;
+        const area = chart.chartArea;
+        if (!xScale || !area) return;
+        const xPixel = xScale.getPixelForValue(cursorValue);
+        if (!Number.isFinite(xPixel)) return;
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.strokeStyle = (opts && opts.color) || '#ff5f5f';
+        ctx.lineWidth = (opts && opts.width) || 1.5;
+        const dash = (opts && opts.dash) || [4, 4];
+        ctx.setLineDash(dash);
+        ctx.beginPath();
+        ctx.moveTo(xPixel, area.top);
+        ctx.lineTo(xPixel, area.bottom);
+        ctx.stroke();
+        ctx.restore();
+      },
+    };
+    Chart.register(timeCursorPlugin);
+
+    function updateRealtimeClock() {
+      if (!clockLabel) return;
+      const now = new Date();
+      clockLabel.textContent = now.toLocaleTimeString();
+    }
+    updateRealtimeClock();
+    setInterval(updateRealtimeClock, 1000);
+
+    function redrawTimeCursor() {
+      requestAnimationFrame(() => {
+        if (poseChart) poseChart.draw();
+        if (timestampChart) timestampChart.draw();
+        if (jointChart) jointChart.draw();
+        if (gripperChart) gripperChart.draw();
+        if (valuePoseChart) valuePoseChart.draw();
+        if (valueGripperChart) valueGripperChart.draw();
+      });
+    }
+
+    async function fetchJSON(url) {
+      const response = await fetch(url);
+      if (!response.ok) {
+        const msg = await response.text();
+        throw new Error(msg || response.statusText);
+      }
+      return response.json();
+    }
+
+    async function loadEpisodes() {
+      const data = await fetchJSON('/api/episodes');
+      episodeSelect.innerHTML = '';
+      data.episodes.forEach((ep) => {
+        const option = document.createElement('option');
+        option.value = ep.name;
+        option.textContent = `${ep.name} (${(ep.size_bytes / 1e6).toFixed(1)} MB)`;
+        episodeSelect.appendChild(option);
+      });
+    }
+
+    async function loadEpisodeMeta() {
+      const name = episodeSelect.value;
+      if (!name) return;
+      const meta = await fetchJSON(`/api/meta?episode=${encodeURIComponent(name)}`);
+      currentEpisode = name;
+      frameCount = meta.frame_count;
+      cameras = meta.cameras || [];
+      episodeStartSec = (meta.start_timestamp_ns || 0) / 1e9;
+      frameSlider.min = 0;
+      frameSlider.max = Math.max(0, frameCount - 1);
+      frameSlider.value = 0;
+      frameLabel.textContent = `Frame 0 / ${frameCount}`;
+      currentPlaybackTime = 0;
+      if (playbackLabel) {
+        playbackLabel.textContent = 't = 0.00 s';
+      }
+      if (timestampStatus) {
+        timestampStatus.textContent = 'Enter start/end (seconds from episode start) to plot.';
+      }
+      statusBox.textContent = `Frames: ${frameCount}, Duration: ${meta.duration_sec.toFixed(2)} s`;
+      imagesContainer.innerHTML = '';
+      cameras.forEach((cam) => {
+        const card = document.createElement('div');
+        card.className = 'camera-card';
+        card.dataset.idx = cam.idx;
+        const title = document.createElement('h3');
+        title.textContent = `${cam.name} (${cam.channel})`;
+        const img = document.createElement('img');
+        img.alt = cam.name;
+        card.appendChild(title);
+        card.appendChild(img);
+        const caption = document.createElement('div');
+        caption.className = 'status';
+        caption.textContent = cam.available ? 'Waiting for frame...' : 'No frames recorded';
+        card.appendChild(caption);
+        imagesContainer.appendChild(card);
+      });
+      await loadFrame(0);
+      timestampStart.value = '0';
+      timestampEnd.value = '5';
+      try {
+        await applyTimestampRange();
+      } catch (err) {
+        console.error(err);
+        timestampStatus.textContent = 'Failed to load timestamps';
+      }
+      loadPoseSeries().catch((err) => {
+        console.error(err);
+        poseStatus.textContent = 'Failed to load pose data';
+      });
+      loadJointSeries().catch((err) => {
+        console.error(err);
+        jointSeriesStatus.textContent = 'Failed to load joint data';
+        gripperStatus.textContent = 'Failed to load gripper data';
+      });
+    }
+
+    async function loadFrame(idx) {
+      if (currentEpisode === null) return;
+      const frame = await fetchJSON(`/api/frame?episode=${encodeURIComponent(currentEpisode)}&index=${idx}`);
+      frameLabel.textContent = `Frame ${frame.index} / ${frameCount}`;
+      frameSlider.value = frame.index;
+      currentPlaybackTime = frame.timestamp_sec || 0;
+      if (playbackLabel) {
+        playbackLabel.textContent = `t = ${currentPlaybackTime.toFixed(2)} s`;
+      }
+      updateImages(frame.cameras);
+      redrawTimeCursor();
+    }
+
+    function updateImages(cameraData) {
+      imagesContainer.querySelectorAll('.camera-card').forEach((card) => {
+        const idx = card.dataset.idx;
+        const img = card.querySelector('img');
+        const caption = card.querySelector('.status');
+        const data = cameraData && cameraData[idx];
+        if (data) {
+          img.src = `data:image/${data.format};base64,${data.data}`;
+          caption.textContent = `t = ${data.timestamp_sec.toFixed(3)} s`;
+        }
+      });
+    }
+
+    function createLineChart(canvas, yLabel) {
+      const ctx = canvas.getContext('2d');
+      return new Chart(ctx, {
+        type: 'line',
+        data: { datasets: [] },
+        options: {
+          responsive: true,
+          animation: false,
+          interaction: { mode: 'nearest', intersect: false },
+          elements: {
+            point: { radius: 1.5, hitRadius: 6 },
+            line: { borderWidth: 1.5 },
+          },
+          scales: {
+            x: { type: 'linear', title: { display: true, text: 'Time (s)' } },
+            y: { title: { display: true, text: yLabel } },
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: { boxWidth: 10, boxHeight: 8, padding: 6 },
+            },
+            timeCursor: { color: '#ff5f5f', width: 2, dash: [4, 4] },
+          },
+        },
+      });
+    }
+
+    function ensurePoseChart() {
+      if (!poseChart) {
+        poseChart = createLineChart(poseCanvas, 'Position (m)');
+      }
+      return poseChart;
+    }
+
+    function ensureJointChart() {
+      if (!jointChart) {
+        jointChart = createLineChart(jointCanvas, 'Joint position (rad)');
+      }
+      return jointChart;
+    }
+
+    function ensureGripperChart() {
+      if (!gripperChart) {
+        gripperChart = createLineChart(gripperCanvas, 'Gripper position');
+      }
+      return gripperChart;
+    }
+
+
+    function updatePoseChart(poseResponse) {
+      const responseOriginSec = (poseResponse && poseResponse.origin_timestamp_ns ? poseResponse.origin_timestamp_ns / 1e9 : 0);
+      const seriesData = (poseResponse && poseResponse.series) || {};
+      const chart = ensurePoseChart();
+      const datasets = [];
+      const axisNames = ['x', 'y', 'z'];
+      const colors = {
+        current: ['#ff6b6b', '#f0ad4e', '#ffd166'],
+        command: ['#4dabf7', '#4dd0e1', '#9575cd'],
+      };
+      const labels = { current: 'Current', command: 'Command' };
+
+      function appendDatasets(seriesKey) {
+        const series = seriesData[seriesKey];
+        if (!series || !series.timestamps_sec || !series.timestamps_sec.length) {
+          return;
+        }
+        const relTimes = series.timestamps_sec || [];
+        axisNames.forEach((axis, idx) => {
+          const values = (series.positions && series.positions[axis]) || [];
+          if (!values.length) return;
+          const points = relTimes.map((t, i) => ({
+            x: responseOriginSec + t - episodeStartSec,
+            y: values[i],
+          }));
+          datasets.push({
+            label: `${labels[seriesKey]} ${axis.toUpperCase()}`,
+            data: points,
+            borderColor: colors[seriesKey][idx],
+            backgroundColor: colors[seriesKey][idx],
+            pointRadius: 0,
+            tension: 0.1,
+            fill: false,
+          });
+        });
+      }
+
+      appendDatasets('current');
+      appendDatasets('command');
+
+      chart.$timeOriginSec = episodeStartSec;
+      if (!datasets.length) {
+        poseStatus.textContent = 'No pose data available.';
+        chart.data.datasets = [];
+        chart.update();
+        return;
+      }
+      poseStatus.textContent = '';
+      chart.data.datasets = datasets;
+      chart.update();
+    }
+
+    function buildJointDatasets(seriesData, colors, baseOriginSec = null) {
+      if (!seriesData) {
+        return [];
+      }
+      const timesNs = seriesData.timestamps_ns || [];
+      const seriesOriginSec = seriesData.origin_timestamp_ns ? seriesData.origin_timestamp_ns / 1e9 : 0;
+      const relTimes = seriesData.timestamps_sec || [];
+      const timesSec = timesNs.length
+        ? timesNs.map((ns) => ns / 1e9)
+        : relTimes.map((t) => t + seriesOriginSec);
+      if (!timesSec.length) {
+        return [];
+      }
+      const names = seriesData.names || [];
+      const positions = seriesData.positions || {};
+      const datasets = [];
+      names.forEach((name, idx) => {
+        const values = positions[name] || [];
+        if (!values.length) return;
+        const baseOrigin = baseOriginSec ?? 0;
+        const points = timesSec.map((t, i) => ({
+          x: t - baseOrigin,
+          y: values[i],
+        }));
+        datasets.push({
+          label: name,
+          data: points,
+          borderColor: colors[idx % colors.length],
+          backgroundColor: colors[idx % colors.length],
+          pointRadius: 0,
+          tension: 0.1,
+          fill: false,
+        });
+      });
+      return datasets;
+    }
+
+    function updateJointPositionChart(seriesData) {
+      const chart = ensureJointChart();
+      const datasets = buildJointDatasets(seriesData, robotJointColors, episodeStartSec);
+      chart.$timeOriginSec = episodeStartSec;
+      if (!datasets.length) {
+        jointSeriesStatus.textContent = 'No joint data available.';
+        chart.data.datasets = [];
+        chart.update();
+        return;
+      }
+      jointSeriesStatus.textContent = '';
+      chart.data.datasets = datasets;
+      chart.update();
+    }
+
+    function updateGripperPositionChart(seriesData, commandSeries) {
+      const chart = ensureGripperChart();
+      const datasets = buildJointDatasets(seriesData, gripperJointColors, episodeStartSec);
+      if (commandSeries && (commandSeries.timestamps_ns || commandSeries.timestamps_sec)) {
+        const values = commandSeries.values || [];
+        if (values.length) {
+          const commandOriginSec = commandSeries.origin_timestamp_ns ? commandSeries.origin_timestamp_ns / 1e9 : 0;
+          const relTimes = commandSeries.timestamps_sec || [];
+          const timesNs = commandSeries.timestamps_ns || [];
+          const timesSec = timesNs.length
+            ? timesNs.map((ns) => ns / 1e9)
+            : relTimes.map((t) => t + commandOriginSec);
+          const epsilon = 1e-6;
+          const points = [];
+          let prevValue = 1.0 - values[0];
+          let prevTime = 0;
+
+          if (timesSec.length) {
+            const firstRelTime = timesSec[0] - episodeStartSec;
+            if (firstRelTime > 0) {
+              points.push({ x: 0, y: prevValue });
+              points.push({ x: Math.max(firstRelTime - epsilon, 0), y: prevValue });
+            } else {
+              prevTime = firstRelTime;
+              points.push({ x: firstRelTime, y: prevValue });
+            }
+          } else {
+            points.push({ x: 0, y: prevValue });
+          }
+
+          timesSec.forEach((timeSec, idx) => {
+            const currentValue = values[idx];
+            const relTime = timeSec - episodeStartSec;
+            if (relTime > prevTime + epsilon) {
+              points.push({ x: Math.max(relTime - epsilon, prevTime), y: prevValue });
+            }
+            points.push({ x: relTime, y: currentValue });
+            prevValue = currentValue;
+            prevTime = relTime;
+          });
+
+          points.push({ x: prevTime + epsilon, y: prevValue });
+
+          datasets.push({
+            label: 'Command',
+            data: points,
+            borderColor: '#ffa94d',
+            backgroundColor: '#ffa94d',
+            borderDash: [5, 3],
+            pointRadius: 0,
+            tension: 0.1,
+            stepped: 'after',
+            fill: false,
+          });
+        }
+      }
+      chart.$timeOriginSec = episodeStartSec;
+      if (!datasets.length) {
+        gripperStatus.textContent = 'No gripper data available.';
+        chart.data.datasets = [];
+        chart.update();
+        return;
+      }
+      gripperStatus.textContent = '';
+      chart.data.datasets = datasets;
+      chart.update();
+    }
+
+    function ensureTimestampChart() {
+      if (timestampChart) return timestampChart;
+      timestampCanvas.style.height = '600px';
+      timestampCanvas.style.maxHeight = '600px';
+      timestampCanvas.height = 600;
+      timestampChart = new Chart(timestampCanvas.getContext('2d'), {
+        type: 'scatter',
+        data: { datasets: [] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: 'Channel Timestamps (relative seconds)' },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const label = ctx.dataset.label || 'channel';
+                  const x = ctx.raw.x?.toFixed(3);
+                  return `${label}: t=${x}s`;
+                },
+              },
+            },
+            timeCursor: { color: '#ffa94d', width: 1 },
+          },
+          scales: {
+            x: {
+              type: 'linear',
+              title: { display: true, text: 'Time (s from origin)' },
+            },
+            y: {
+              type: 'linear',
+              ticks: {
+                callback: (value) => {
+                  const idx = Math.round(value);
+                  return timestampChart?.$channelLabels?.[idx] ?? '';
+                },
+              },
+              title: { display: true, text: 'Channel' },
+              suggestedMin: -0.5,
+            },
+          },
+        },
+      });
+      return timestampChart;
+    }
+
+    function updateTimestampScatter(seriesData) {
+      const chart = ensureTimestampChart();
+      const channels = seriesData.channels || [];
+      if (!channels.length) {
+        timestampStatus.textContent = 'No timestamps available.';
+        chart.data.datasets = [];
+        chart.update();
+        return;
+      }
+      const originSec = (seriesData.origin_timestamp_ns || 0) / 1e9;
+      chart.$timeOriginSec = originSec;
+      const labels = channels.map((ch) => ch.key);
+      chart.$channelLabels = labels;
+      const datasets = channels.map((ch, idx) => {
+        const ts = ch.timestamps_ns || [];
+        const points = ts.map((t) => ({ x: (t - originSec * 1e9) / 1e9, y: idx }));
+        return {
+          label: ch.key,
+          data: points,
+          showLine: false,
+          pointRadius: 2,
+          pointHoverRadius: 3,
+        };
+      });
+      timestampStatus.textContent = '';
+      chart.data.datasets = datasets;
+      chart.options.scales.y.suggestedMax = channels.length - 0.5;
+      chart.update();
+    }
+
+    async function applyTimestampRange() {
+      if (!currentEpisode) {
+        timestampStatus.textContent = 'Load an episode first.';
+        return;
+      }
+      const startVal = parseFloat(timestampStart.value);
+      const endVal = parseFloat(timestampEnd.value);
+      if (!Number.isFinite(startVal) || !Number.isFinite(endVal)) {
+        timestampStatus.textContent = 'Enter valid start and end times (seconds).';
+        return;
+      }
+      if (endVal < startVal) {
+        timestampStatus.textContent = 'End must be >= start.';
+        return;
+      }
+      timestampStatus.textContent = `Loading timestamps for ${startVal}s to ${endVal}s...`;
+      const url = `/api/timestamps?episode=${encodeURIComponent(currentEpisode)}&start=${startVal}&end=${endVal}`;
+      const response = await fetchJSON(url);
+      updateTimestampScatter(response);
+      redrawTimeCursor();
+    }
+
+    function ensureValuePoseChart() {
+      if (valuePoseChart) return valuePoseChart;
+      valuePoseChart = new Chart(valuePoseCanvas.getContext('2d'), {
+        type: 'line',
+        data: { datasets: [] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'nearest', intersect: false },
+          scales: {
+            x: { type: 'linear', title: { display: true, text: 'Frame index' } },
+            y: { title: { display: true, text: 'Position (m)' } },
+          },
+          plugins: { legend: { position: 'top' }, timeCursor: { color: '#ff5f5f', width: 2, dash: [4, 4] } },
+        },
+      });
+      return valuePoseChart;
+    }
+
+    function ensureValueGripperChart() {
+      if (valueGripperChart) return valueGripperChart;
+      valueGripperChart = new Chart(valueGripperCanvas.getContext('2d'), {
+        type: 'line',
+        data: { datasets: [] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'nearest', intersect: false },
+          scales: {
+            x: { type: 'linear', title: { display: true, text: 'Frame index' } },
+            y: { title: { display: true, text: 'Gripper position' } },
+          },
+          plugins: { legend: { position: 'top' }, timeCursor: { color: '#ff5f5f', width: 2, dash: [4, 4] } },
+        },
+      });
+      return valueGripperChart;
+    }
+
+    function showValueSlice() {
+      if (!cachedPoseSeries || !cachedJointSeries) {
+        valueStatus.textContent = 'Load pose and joint data first.';
+        clearValueCharts();
+        return;
+      }
+      const startIdx = Math.max(0, Math.floor(Number(valueStart.value)));
+      const endIdx = Math.floor(Number(valueEnd.value));
+      if (!Number.isFinite(startIdx) || !Number.isFinite(endIdx) || endIdx < startIdx) {
+        valueStatus.textContent = 'Enter valid start/end indices (end >= start).';
+        clearValueCharts();
+        return;
+      }
+      valueStatus.textContent = '';
+
+      // Pose (current) within time window
+      const poseSeries = (cachedPoseSeries.series && cachedPoseSeries.series.current) || null;
+      const poseTimeline = cachedPoseSeries.timeline_sec || [];
+      const commandSeries = (cachedPoseSeries.series && cachedPoseSeries.series.command) || null;
+      const poseChart = ensureValuePoseChart();
+      poseChart.data.datasets = [];
+      const poseLen = (poseSeries && poseSeries.positions && (poseSeries.positions.x || []).length) || 0;
+      const tsPose =
+        poseTimeline.length && poseTimeline.length === poseLen
+          ? poseTimeline
+          : (poseSeries && poseSeries.timestamps_sec) || [];
+      if (poseSeries && poseSeries.positions && tsPose.length && poseLen) {
+        const xs = poseSeries.positions.x || [];
+        const ys = poseSeries.positions.y || [];
+        const zs = poseSeries.positions.z || [];
+        const datasets = [
+          { label: 'x', data: [], borderColor: '#ef476f' },
+          { label: 'y', data: [], borderColor: '#06d6a0' },
+          { label: 'z', data: [], borderColor: '#118ab2' },
+        ];
+        for (let i = startIdx; i <= endIdx && i < poseLen; i++) {
+          datasets[0].data.push({ x: i, y: xs[i] });
+          datasets[1].data.push({ x: i, y: ys[i] });
+          datasets[2].data.push({ x: i, y: zs[i] });
+        }
+        if (commandSeries && commandSeries.positions) {
+          const cmdLen = (commandSeries.positions.x || []).length;
+          const cxs = commandSeries.positions.x || [];
+          const cys = commandSeries.positions.y || [];
+          const czs = commandSeries.positions.z || [];
+          const cmdDatasets = [
+            { label: 'cmd_x', data: [], borderColor: '#f77f00', borderDash: [4, 2] },
+            { label: 'cmd_y', data: [], borderColor: '#80b918', borderDash: [4, 2] },
+            { label: 'cmd_z', data: [], borderColor: '#3a86ff', borderDash: [4, 2] },
+          ];
+          for (let i = startIdx; i <= endIdx && i < cmdLen; i++) {
+            cmdDatasets[0].data.push({ x: i, y: cxs[i] });
+            cmdDatasets[1].data.push({ x: i, y: cys[i] });
+            cmdDatasets[2].data.push({ x: i, y: czs[i] });
+          }
+          datasets.push(...cmdDatasets.filter((d) => d.data.length));
+        }
+        poseChart.$timeOriginSec = episodeStartSec;
+        poseChart.data.datasets = datasets.filter((d) => d.data.length);
+        poseChart.update();
+      } else {
+        poseChart.data.datasets = [];
+        poseChart.update();
+      }
+
+      // Gripper joints within time window
+      const gripperSeries = cachedJointSeries.gripper || {};
+      const names = gripperSeries.names || [];
+      const positions = gripperSeries.positions || {};
+      const posLengths = names.map((n) => (positions[n] || []).length);
+      const posLen = posLengths.length ? Math.max(...posLengths) : 0;
+      const gripperCommand = cachedJointSeries.gripper_command || {};
+      const gcmdTs = gripperCommand.timestamps_sec || [];
+      const gcmdVals = gripperCommand.values || [];
+      const gripperChart = ensureValueGripperChart();
+      gripperChart.data.datasets = [];
+      if (posLen) {
+        const datasets = names.map((name, idx) => ({
+          label: name || `j${idx}`,
+          data: [],
+          borderColor: robotJointColors[idx % robotJointColors.length],
+        }));
+        for (let i = startIdx; i <= endIdx && i < posLen; i++) {
+          names.forEach((name, idx) => {
+            const val = positions[name]?.[i];
+            if (val !== undefined) {
+              datasets[idx].data.push({ x: i, y: val });
+            }
+          });
+        }
+        if (gcmdTs.length && gcmdVals.length) {
+          const cmdData = [];
+          for (let i = startIdx; i <= endIdx && i < gcmdVals.length; i++) {
+            cmdData.push({ x: i, y: gcmdVals[i] });
+          }
+          if (cmdData.length) {
+            datasets.push({
+              label: 'gripper_cmd',
+              data: cmdData,
+              borderColor: '#ffa94d',
+              borderDash: [4, 2],
+            });
+          }
+        }
+        gripperChart.$timeOriginSec = episodeStartSec;
+        gripperChart.data.datasets = datasets.filter((d) => d.data.length);
+        gripperChart.update();
+      } else {
+        gripperChart.data.datasets = [];
+        gripperChart.update();
+      }
+    }
+
+    function clearValueCharts() {
+      const poseChart = ensureValuePoseChart();
+      const gripperChart = ensureValueGripperChart();
+      poseChart.data.datasets = [];
+      gripperChart.data.datasets = [];
+      poseChart.update();
+      gripperChart.update();
+    }
+
+    async function loadPoseSeries() {
+      if (!currentEpisode) return;
+      const response = await fetchJSON(`/api/poses?episode=${encodeURIComponent(currentEpisode)}`);
+      cachedPoseSeries = response;
+      updatePoseChart(response);
+      redrawTimeCursor();
+      maybeRenderValueSlice();
+    }
+
+    async function loadJointSeries() {
+      if (!currentEpisode) return;
+      const response = await fetchJSON(`/api/joints?episode=${encodeURIComponent(currentEpisode)}`);
+      cachedJointSeries = response;
+      updateJointPositionChart(response.robot);
+      updateGripperPositionChart(response.gripper, response.gripper_command);
+      redrawTimeCursor();
+      maybeRenderValueSlice();
+    }
+
+    frameSlider.addEventListener('input', (event) => {
+      const idx = Number(event.target.value);
+      loadFrame(idx).catch((err) => {
+        console.error(err);
+        statusBox.textContent = 'Failed to load frame';
+      });
+    });
+
+    loadButton.addEventListener('click', () => {
+      loadEpisodeMeta().catch((err) => {
+        console.error(err);
+        statusBox.textContent = 'Failed to load episode metadata';
+      });
+    });
+
+    timestampApply.addEventListener('click', () => {
+      try {
+        applyTimestampRange();
+      } catch (err) {
+        console.error(err);
+        timestampStatus.textContent = 'Failed to plot timestamps';
+      }
+    });
+
+    valueApply.addEventListener('click', () => {
+      try {
+        showValueSlice();
+      } catch (err) {
+        console.error(err);
+        valueStatus.textContent = 'Failed to show values';
+      }
+    });
+
+    function maybeRenderValueSlice() {
+      if (cachedPoseSeries && cachedJointSeries) {
+        try {
+          showValueSlice();
+        } catch (err) {
+          console.error(err);
+          valueStatus.textContent = 'Failed to render value slice';
+        }
+      }
+    }
+
+    playButton.addEventListener('click', () => {
+      if (playTimer) return;
+      const fps = Number(playFps.value) || 10;
+      const intervalMs = Math.max(10, Math.floor(1000 / fps));
+      playTimer = setInterval(async () => {
+        let idx = Number(frameSlider.value);
+        idx = (idx + 1) % frameCount;
+        try {
+          await loadFrame(idx);
+        } catch (err) {
+          console.error(err);
+          statusBox.textContent = 'Playback error';
+          clearInterval(playTimer);
+          playTimer = null;
+        }
+      }, intervalMs);
+    });
+
+    pauseButton.addEventListener('click', () => {
+      if (playTimer) {
+        clearInterval(playTimer);
+        playTimer = null;
+      }
+    });
+
+    loadEpisodes().catch((err) => {
+      console.error(err);
+      statusBox.textContent = 'Failed to list episodes';
+    });
+  </script>
+</body>
+</html>

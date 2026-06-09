@@ -1,0 +1,18 @@
+_target_: impact.dataset.franka_pick_dataset.FrankaPickDataset
+# Override this from the command line with:
+# dataset.dataset_path=datasets/exported/<DATASET_NAME>/<DATASET_NAME_N>.pkl
+dataset_path: ${project_root}/datasets/exported/ExampleDataset/ExampleDataset_episodes.pkl
+shape_meta: ${shape_meta}
+horizon: ${key_parameters.horizon}
+pad_before: 0
+pad_after: 0
+n_obs_steps: ${key_parameters.n_obs_steps}
+n_latency_steps: ${key_parameters.n_latency_steps}
+val_ratio: 0.1
+max_train_episodes: null
+resize_image_hw: ${key_parameters.resize_image_hw}
+use_disk_cache: true
+cache_path: null
+seed: ${key_parameters.seed}
+load_episodes_limit: null
+normalizer: ${normalizer}

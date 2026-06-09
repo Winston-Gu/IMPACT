@@ -1,0 +1,222 @@
+/**:
+  controller_manager:
+    ros__parameters:
+      update_rate: 1000
+      thread_priority: 99
+      enable_overrun: false
+
+      joint_state_broadcaster:
+        type: joint_state_broadcaster/JointStateBroadcaster
+
+      joint_trajectory_controller:
+        type: joint_trajectory_controller/JointTrajectoryController
+
+      franka_robot_state_broadcaster:
+        type: franka_robot_state_broadcaster/FrankaRobotStateBroadcaster
+        state_interfaces:
+          robot_state
+
+      predictive_noop:
+        type: predictive_controller/NoopEffortController
+
+      cartesian_impedance_controller:
+        type: predictive_controller/CartesianImpedanceController
+
+      residual_observer_controller:
+        type: predictive_controller/ResidualObserverController
+
+      cerebellum_predictive_controller:
+        type: predictive_controller/CerebellumPredictiveController
+
+      pose_broadcaster:
+        type: predictive_controller/PoseBroadcaster
+
+  franka_robot_state_broadcaster:
+    ros__parameters:
+      lock_try_count: 5
+      lock_sleep_interval: 5
+      lock_log_error: true
+      lock_update_success: true
+
+  predictive_noop:
+    ros__parameters:
+      arm_id: "fr3"
+
+  cartesian_impedance_controller:
+    ros__parameters:
+      joints:
+        - fr3_joint1
+        - fr3_joint2
+        - fr3_joint3
+        - fr3_joint4
+        - fr3_joint5
+        - fr3_joint6
+        - fr3_joint7
+
+      end_effector_frame: fr3_hand_tcp # ros_ws/src/vendor/franka_description/end_effectors/franka_hand/franka_hand.srdf.xacro
+      base_frame: fr3_link0
+
+      filter:
+        q: 0.5
+        dq: 0.5
+        output_torque: 0.5
+
+      task:
+        k_pos_x: 400.0
+        k_pos_y: 400.0
+        k_pos_z: 400.0
+        k_rot_x: 30.0
+        k_rot_y: 30.0
+        k_rot_z: 30.0
+
+      nullspace:
+        stiffness: 2.0
+
+      use_friction: false
+      use_coriolis_compensation: true
+      use_local_jacobian: true # If true, then the controller uses the end-effector frame.
+
+      limit_error: true
+
+  residual_observer_controller:
+    ros__parameters:
+      joints:
+        - fr3_joint1
+        - fr3_joint2
+        - fr3_joint3
+        - fr3_joint4
+        - fr3_joint5
+        - fr3_joint6
+        - fr3_joint7
+
+      end_effector_frame: fr3_hand_tcp # ros_ws/src/vendor/franka_description/end_effectors/franka_hand/franka_hand.srdf.xacro
+      base_frame: fr3_link0
+
+      filter:
+        q: 0.5
+        dq: 0.5
+        output_torque: 0.5
+
+      task:
+        k_pos_x: 400.0
+        k_pos_y: 400.0
+        k_pos_z: 400.0
+        k_rot_x: 30.0
+        k_rot_y: 30.0
+        k_rot_z: 30.0
+
+      nullspace:
+        stiffness: 2.0
+
+      use_friction: false
+      use_coriolis_compensation: true
+      use_local_jacobian: true # If true, then the controller uses the end-effector frame.
+
+      use_external_wrench_observer: true
+
+  cerebellum_predictive_controller:
+    ros__parameters:
+      joints:
+        - fr3_joint1
+        - fr3_joint2
+        - fr3_joint3
+        - fr3_joint4
+        - fr3_joint5
+        - fr3_joint6
+        - fr3_joint7
+
+      end_effector_frame: fr3_hand_tcp # ros_ws/src/vendor/franka_description/end_effectors/franka_hand/franka_hand.srdf.xacro
+      base_frame: fr3_link0
+
+      filter:
+        q: 0.5
+        dq: 0.5
+        output_torque: 0.5
+
+      task:
+        k_pos_x: 400.0
+        k_pos_y: 400.0
+        k_pos_z: 400.0
+        k_rot_x: 30.0
+        k_rot_y: 30.0
+        k_rot_z: 30.0
+
+      nullspace:
+        stiffness: 2.0
+
+      use_friction: false
+      use_coriolis_compensation: true
+      use_local_jacobian: true # If true, then the controller uses the end-effector frame.
+
+      use_external_wrench_observer: true
+
+      # Parameters for External Force Observer
+      observer_lambda: 0.02
+      observer_lpf_alpha: 0.02
+      observer_use_mass_ddq: false
+      observer_use_friction: false
+      observer_min_speed_for_update: 0.0
+
+      # Slow-Faset Decomposition
+      cereb_bias_enable: true
+
+      cereb_bias_alpha_force: 0.5
+      cereb_bias_alpha_torque: 0.5
+
+      cereb_bias_huber_force: 10.0
+      cereb_bias_huber_torque: 1.0
+
+      cereb_bias_leak: 0.01
+
+      cereb_bias_max_force: 50.0
+      cereb_bias_max_torque: 8.0
+
+      # Cerebelum Learning
+      cereb_model_enable: true
+      cereb_weight_model_enable: true
+      cereb_weight_ff_holdoff_sec: 0.5
+      cereb_weight_reset_ratio: 0.8
+      cereb_readings_noisy: true
+      cereb_gripper_command_topic: "/fr3_right/gripper/gripper_position_controller/commands"
+      cereb_sgd_slow_rate_threshold: 0.2
+      cereb_surprise_lpf_alpha: 0.0001
+
+
+  pose_broadcaster:
+    ros__parameters:
+      joints:
+        - fr3_joint1
+        - fr3_joint2
+        - fr3_joint3
+        - fr3_joint4
+        - fr3_joint5
+        - fr3_joint6
+        - fr3_joint7
+
+      end_effector_frame: fr3_hand_tcp
+      base_frame: fr3_link0
+      publish_frequency: 250.0
+
+  joint_trajectory_controller:
+    ros__parameters:
+      command_interfaces:
+        - effort
+      state_interfaces:
+        - position
+        - velocity
+      joints:
+        - fr3_joint1
+        - fr3_joint2
+        - fr3_joint3
+        - fr3_joint4
+        - fr3_joint5
+        - fr3_joint6
+        - fr3_joint7
+      gains:
+        fr3_joint1: { p: 600., d: 30., i: 0., i_clamp: 1. }
+        fr3_joint2: { p: 600., d: 30., i: 0., i_clamp: 1. }
+        fr3_joint3: { p: 600., d: 30., i: 0., i_clamp: 1. }
+        fr3_joint4: { p: 600., d: 30., i: 0., i_clamp: 1. }
+        fr3_joint5: { p: 250., d: 10., i: 0., i_clamp: 1. }
+        fr3_joint6: { p: 150., d: 10., i: 0., i_clamp: 1. }
+        fr3_joint7: { p: 50., d: 5., i: 0., i_clamp: 1. }

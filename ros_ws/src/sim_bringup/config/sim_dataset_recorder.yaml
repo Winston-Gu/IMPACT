@@ -1,0 +1,38 @@
+dataset_recorder:
+  ros__parameters:
+    dataset_name: "Sim"
+    output_root: "datasets/raw"
+    autostart: false
+    enable_keyboard_shortcuts: false
+    queue_size: 10
+    metadata_tags: ["sim:mujoco", "task:pick_place", "sensors:front_side"]
+    topics:
+      - "/target_pose"
+      - "/current_pose"
+      - "/joint_states"
+      - "/gripper/joint_states"
+      - "/gripper/gripper_position_controller/commands"
+      - "/camera/front_camera/color/image_rect_raw/compressed"
+      - "/camera/front_camera/color/camera_info"
+      - "/camera/side_camera/color/image_rect_raw/compressed"
+      - "/camera/side_camera/color/camera_info"
+    topic_types:
+      - "geometry_msgs/msg/PoseStamped"
+      - "geometry_msgs/msg/PoseStamped"
+      - "sensor_msgs/msg/JointState"
+      - "sensor_msgs/msg/JointState"
+      - "std_msgs/msg/Float64MultiArray"
+      - "sensor_msgs/msg/CompressedImage"
+      - "sensor_msgs/msg/CameraInfo"
+      - "sensor_msgs/msg/CompressedImage"
+      - "sensor_msgs/msg/CameraInfo"
+    topic_aliases:
+      - "command/target_pose"
+      - "robot/current_pose"
+      - "robot/joint_states"
+      - "gripper/joint_states"
+      - "gripper/command"
+      - "cameras/0/color_image"
+      - "cameras/0/camera_info"
+      - "cameras/1/color_image"
+      - "cameras/1/camera_info"

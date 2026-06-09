@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>system_bringup</name>
+  <version>0.0.0</version>
+  <description>Minimal bringup flows for system-level controller profiling.</description>
+  <maintainer email="winstongu20@gmail.com">IMPACT Authors</maintainer>
+  <license>Apache-2.0</license>
+
+  <depend>xacro</depend>
+  <depend>joint_state_publisher</depend>
+  <exec_depend>controller_manager</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>rosidl_runtime_py</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+  <exec_depend>franka_msgs</exec_depend>
+  <exec_depend>python3-pynput</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>joycon_teleop</exec_depend>
+  <exec_depend>cameras</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>franka_description</exec_depend>
+  <exec_depend>franka_hardware</exec_depend>
+  <exec_depend>franka_gripper</exec_depend>
+  <exec_depend>franka_robot_state_broadcaster</exec_depend>
+  <exec_depend>opencv-python</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

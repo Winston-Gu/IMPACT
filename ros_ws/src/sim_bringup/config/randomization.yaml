@@ -1,0 +1,12 @@
+randomization:
+  cube_x_min: 0.25
+  cube_x_max: 0.40
+  cube_y_min: -0.4
+  cube_y_max: -0.2
+  cube_mass_min: 0.1
+  cube_mass_max: 0.2
+  cube_spawn_clearance: 0.005
+  basket_x_min: 0.3
+  basket_x_max: 0.40
+  basket_y_min: 0.1
+  basket_y_max: 0.3

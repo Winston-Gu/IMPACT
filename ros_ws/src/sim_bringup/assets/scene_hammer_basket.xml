@@ -1,0 +1,146 @@
+<mujoco model="fr3_scene">
+  <option cone="elliptic" impratio="10"/>
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3"
+             markrgb="0.8 0.8 0.8" width="300" height="300"/>
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2"/>
+    <texture name="table_wood_tex" type="2d" file="textures/wood1.png" />
+    <texture name="table_stone_tex" type="2d" file="textures/stone0.png" />
+    <texture name="metal_tex" type="2d" file="textures/metal2.png" />
+    <texture name="metal_tex_cube" type="2d" file="textures/metal1.png" />
+    <material name="table_wood_mat" texture="table_wood_tex" rgba="0.9 0.9 0.9 1" texuniform="true" texrepeat="2 2" reflectance="0.2"/>
+    <material name="table_stone_mat" texture="table_stone_tex" rgba="0.85 0.85 0.85 1" texuniform="true" texrepeat="2 2" reflectance="0.3"/>
+    <material name="pedestal_metal_mat" texture="metal_tex" rgba="0.85 0.85 0.85 1" texuniform="true" texrepeat="1 1" reflectance="0.4"/>
+    <material name="pedestal_metal_side_mat" texture="metal_tex" rgba="0.85 0.85 0.85 1" texuniform="true" texrepeat="6 12" reflectance="0.4"/>
+    <material name="cube_metal_mat" texture="metal_tex_cube" rgba="0.9 0.9 0.9 1" texuniform="true" texrepeat="2 2" reflectance="0.4"/>
+    <texture name="hammer_tex" type="2d" file="objects/Cole_Hardware_Hammer_Black/texture.png"/>
+    <material name="hammer_mat" texture="hammer_tex" specular="0.5" shininess="0.5"/>
+    <mesh name="hammer_mesh" file="objects/Cole_Hardware_Hammer_Black/model.obj"/>
+    <mesh name="hammer_col_0" file="objects/Cole_Hardware_Hammer_Black/model_collision_0.obj"/>
+    <mesh name="hammer_col_1" file="objects/Cole_Hardware_Hammer_Black/model_collision_1.obj"/>
+    <mesh name="hammer_col_2" file="objects/Cole_Hardware_Hammer_Black/model_collision_2.obj"/>
+    <mesh name="hammer_col_3" file="objects/Cole_Hardware_Hammer_Black/model_collision_3.obj"/>
+    <mesh name="hammer_col_4" file="objects/Cole_Hardware_Hammer_Black/model_collision_4.obj"/>
+    <mesh name="hammer_col_5" file="objects/Cole_Hardware_Hammer_Black/model_collision_5.obj"/>
+    <mesh name="hammer_col_6" file="objects/Cole_Hardware_Hammer_Black/model_collision_6.obj"/>
+    <mesh name="hammer_col_7" file="objects/Cole_Hardware_Hammer_Black/model_collision_7.obj"/>
+    <mesh name="hammer_col_8" file="objects/Cole_Hardware_Hammer_Black/model_collision_8.obj"/>
+    <mesh name="hammer_col_9" file="objects/Cole_Hardware_Hammer_Black/model_collision_9.obj"/>
+    <mesh name="hammer_col_10" file="objects/Cole_Hardware_Hammer_Black/model_collision_10.obj"/>
+    <mesh name="hammer_col_11" file="objects/Cole_Hardware_Hammer_Black/model_collision_11.obj"/>
+    <mesh name="hammer_col_12" file="objects/Cole_Hardware_Hammer_Black/model_collision_12.obj"/>
+    <mesh name="hammer_col_13" file="objects/Cole_Hardware_Hammer_Black/model_collision_13.obj"/>
+    <mesh name="hammer_col_14" file="objects/Cole_Hardware_Hammer_Black/model_collision_14.obj"/>
+    <mesh name="hammer_col_15" file="objects/Cole_Hardware_Hammer_Black/model_collision_15.obj"/>
+    <mesh name="hammer_col_16" file="objects/Cole_Hardware_Hammer_Black/model_collision_16.obj"/>
+    <mesh name="hammer_col_17" file="objects/Cole_Hardware_Hammer_Black/model_collision_17.obj"/>
+    <mesh name="hammer_col_18" file="objects/Cole_Hardware_Hammer_Black/model_collision_18.obj"/>
+    <mesh name="hammer_col_19" file="objects/Cole_Hardware_Hammer_Black/model_collision_19.obj"/>
+    <mesh name="hammer_col_20" file="objects/Cole_Hardware_Hammer_Black/model_collision_20.obj"/>
+    <mesh name="hammer_col_21" file="objects/Cole_Hardware_Hammer_Black/model_collision_21.obj"/>
+    <mesh name="hammer_col_22" file="objects/Cole_Hardware_Hammer_Black/model_collision_22.obj"/>
+    <mesh name="hammer_col_23" file="objects/Cole_Hardware_Hammer_Black/model_collision_23.obj"/>
+    <mesh name="hammer_col_24" file="objects/Cole_Hardware_Hammer_Black/model_collision_24.obj"/>
+    <mesh name="hammer_col_25" file="objects/Cole_Hardware_Hammer_Black/model_collision_25.obj"/>
+    <mesh name="hammer_col_26" file="objects/Cole_Hardware_Hammer_Black/model_collision_26.obj"/>
+    <mesh name="hammer_col_27" file="objects/Cole_Hardware_Hammer_Black/model_collision_27.obj"/>
+    <mesh name="hammer_col_28" file="objects/Cole_Hardware_Hammer_Black/model_collision_28.obj"/>
+    <mesh name="hammer_col_29" file="objects/Cole_Hardware_Hammer_Black/model_collision_29.obj"/>
+    <mesh name="hammer_col_30" file="objects/Cole_Hardware_Hammer_Black/model_collision_30.obj"/>
+    <mesh name="hammer_col_31" file="objects/Cole_Hardware_Hammer_Black/model_collision_31.obj"/>
+  </asset>
+  <include file="fr3_menagerie_torque_gripper.xml"/>
+
+  <worldbody>
+    <light pos="0 0 1.5" dir="0 0 -1" directional="true"/>
+    <geom name="floor" size="0 0 0.05" type="plane" material="groundplane"/>
+
+    <geom name="robot_pedestal_base" type="box" size="0.2 0.4 0.01" pos="0 0 0.01" material="pedestal_metal_mat"/>
+    <geom name="robot_pedestal_top" type="box" size="0.2 0.4 0.01" pos="0 0 0.29" material="pedestal_metal_mat"/>
+    <geom name="robot_pedestal_front" type="box" size="0.2 0.01 0.14" pos="0 0.39 0.15" material="pedestal_metal_side_mat"/>
+    <geom name="robot_pedestal_back" type="box" size="0.2 0.01 0.14" pos="0 -0.39 0.15" material="pedestal_metal_side_mat"/>
+    <geom name="robot_pedestal_left" type="box" size="0.01 0.4 0.14" pos="0.19 0 0.15" material="pedestal_metal_side_mat"/>
+    <geom name="robot_pedestal_right" type="box" size="0.01 0.4 0.14" pos="-0.19 0 0.15" material="pedestal_metal_side_mat"/>
+
+    <body name="table" pos="0.55 0 0.0">
+      <geom name="table_top" type="box" size="0.45 0.6 0.03" pos="0 0 0.5"
+            material="table_stone_mat" friction="0.5 0.05 0.0005" condim="4"
+            solref="0.002 1" solimp="0.9 0.95 0.001 0.5 2"/>
+      <geom name="table_leg_fl" type="box" size="0.03 0.03 0.235" pos="0.35 0.55 0.235" material="table_stone_mat"/>
+      <geom name="table_leg_fr" type="box" size="0.03 0.03 0.235" pos="0.35 -0.55 0.235" material="table_stone_mat"/>
+      <geom name="table_leg_rl" type="box" size="0.03 0.03 0.235" pos="-0.35 0.55 0.235" material="table_stone_mat"/>
+      <geom name="table_leg_rr" type="box" size="0.03 0.03 0.235" pos="-0.35 -0.55 0.235" material="table_stone_mat"/>
+    </body>
+
+    <body name="pick_cube" pos="0.45 0.0 0.62" quat="0.7071068 0.7071068 0 0">
+      <joint name="pick_cube_free" type="free"/>
+      <geom name="pick_cube_geom" type="mesh" mesh="hammer_mesh" material="hammer_mat" pos="-0.02 0.01 -0.05"
+            mass="0.1" contype="0" conaffinity="0" class="visual"/>
+      <geom type="mesh" mesh="hammer_col_0" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_1" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_2" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_3" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_4" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_5" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_6" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_7" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_8" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_9" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_10" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_11" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_12" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_13" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_14" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_15" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_16" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_17" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_18" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_19" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_20" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_21" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_22" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_23" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_24" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_25" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_26" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_27" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_28" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_29" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_30" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+      <geom type="mesh" mesh="hammer_col_31" pos="-0.02 0.01 -0.05" friction="4.0 1.0 0.001" condim="6" solref="0.002 1" solimp="0.95 0.99 0.001 0.5 2" margin="0.0005" gap="0" class="collision"/>
+          </body>
+    <body name="pick_cube_anchor" mocap="true" pos="0.45 0.0 0.62" quat="0.7071068 0.7071068 0 0"/>
+
+    <body name="target_basket" pos="0.65 0.2 0.53">
+      <joint name="target_basket_free" type="free"/>
+      <geom name="basket_base" type="box" size="0.2 0.2 0.005" material="table_wood_mat" mass="0.2"/>
+      <geom name="basket_wall_front" type="box" size="0.2 0.0125 0.025" pos="0 0.1875 0.03" material="table_wood_mat"/>
+      <geom name="basket_wall_back" type="box" size="0.2 0.0125 0.025" pos="0 -0.1875 0.03" material="table_wood_mat"/>
+      <geom name="basket_wall_left" type="box" size="0.0125 0.2 0.025" pos="0.1875 0 0.03" material="table_wood_mat"/>
+      <geom name="basket_wall_right" type="box" size="0.0125 0.2 0.025" pos="-0.1875 0 0.03" material="table_wood_mat"/>
+    </body>
+    <body name="target_basket_anchor" mocap="true" pos="0.65 0.2 0.53"/>
+
+    <camera name="front_camera" pos="1.5 0.0 1.1" quat="0.619272 0.341324 0.341324 0.619272" fovy="60"/>
+    <camera name="side_camera" pos="0.55 -1.1 1.1" quat="0.859899 0.510464 0.0 0.0" fovy="60"/>
+    <camera name="third_person_view" pos="1.2 -1.0 1.2" quat="0.832017 0.476413 0.141228 0.246643" fovy="60"/>
+  </worldbody>
+
+
+  <equality>
+    <weld name="pick_cube_anchor_weld" body1="pick_cube" body2="pick_cube_anchor"/>
+    <weld name="basket_anchor_weld" body1="target_basket" body2="target_basket_anchor"/>
+  </equality>
+
+  <keyframe>
+    <key name="home"
+         qpos="0 -0.785398 0 -2.35619 0 1.5708 0.785398 0 0 0.45 0 0.62 1 0 0 0 0.65 0.2 0.53 1 0 0 0"/>
+  </keyframe>
+</mujoco>

@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:macro name="franka_arm_ros2_control_mujoco"
+         params="arm_id
+                 mujoco_model:=''
+                 hand:=false
+                 gazebo:=false
+                 gazebo_effort:=false
+                 arm_prefix:=''
+                 camera_names:='front_camera,side_camera,third_person_view'
+                 camera_frame_ids:='front_color_optical_frame,side_color_optical_frame,third_person_view_color_optical_frame'
+                 camera_namespace:='camera'">
+
+    <xacro:property name="arm_prefix_modified" value="${'' if arm_prefix == '' else arm_prefix + '_'}" />
+    <ros2_control name="${arm_prefix_modified}FrankaHardwareInterface" type="system">
+        <hardware>
+          <param name="version">0.1.0</param>
+          <param name="arm_id">${arm_id}</param>
+          <param name="prefix">${arm_prefix}</param>
+          <plugin>mujoco_sim/Simulator</plugin>
+          <param name="mujoco_model">${mujoco_model}</param>
+          <param name="gripper_target_topic">/mujoco_gripper/target_width</param>
+          <param name="gripper_kp">10000.0</param>
+          <param name="gripper_kd">5.0</param>
+          <param name="gripper_max_force">200.0</param>
+          <param name="camera_names">${camera_names}</param>
+          <param name="camera_frame_ids">${camera_frame_ids}</param>
+          <param name="camera_namespace">${camera_namespace}</param>
+          <param name="camera_width">640</param>
+          <param name="camera_height">480</param>
+          <param name="camera_rate">30.0</param>
+          <param name="camera_publish_compressed">true</param>
+          <param name="camera_jpeg_quality">90</param>
+        </hardware>
+
+      <!-- Joint interfaces (effort-only commands to match MuJoCo SystemInterface) -->
+      <xacro:macro name="configure_joint" params="joint_name initial_position">
+        <joint name="${joint_name}">
+          <!-- Command interface: effort only -->
+          <command_interface name="effort"/>
+
+          <!-- State Interfaces -->
+          <state_interface name="position">
+            <param name="initial_value">${initial_position}</param>
+          </state_interface>
+          <state_interface name="velocity"/>
+            <param name="initial_value">0.0</param>
+          <state_interface name="effort"/>
+        </joint>
+      </xacro:macro>
+
+
+      <xacro:configure_joint joint_name="${arm_prefix}${arm_id}_joint1" initial_position="0.0"/>
+      <xacro:configure_joint joint_name="${arm_prefix}${arm_id}_joint2" initial_position="${-pi/4}"/>
+      <xacro:configure_joint joint_name="${arm_prefix}${arm_id}_joint3" initial_position="0.0"/>
+      <xacro:configure_joint joint_name="${arm_prefix}${arm_id}_joint4" initial_position="${-3*pi/4}"/>
+      <xacro:configure_joint joint_name="${arm_prefix}${arm_id}_joint5" initial_position="0.0"/>
+      <xacro:configure_joint joint_name="${arm_prefix}${arm_id}_joint6" initial_position="${pi/2}"/>
+      <xacro:configure_joint joint_name="${arm_prefix}${arm_id}_joint7" initial_position="${pi/4}"/>
+      <xacro:if value="${gazebo and hand}">
+        <xacro:configure_joint joint_name="${arm_prefix}${arm_id}_finger_joint1" initial_position="0.0" />
+      </xacro:if>
+
+    </ros2_control>
+    <xacro:if value="${gazebo}">
+      <gazebo>
+        <plugin filename="franka_gz_ros2_control-system" name="gz_ros2_control::GZROS2ControlPlugin">
+          <parameters>$(find franka_gazebo_bringup)/config/franka_gazebo_controllers.yaml</parameters>
+        </plugin>
+      </gazebo>
+    </xacro:if>
+
+  </xacro:macro>
+</robot>

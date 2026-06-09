@@ -1,0 +1,13 @@
+repositories:
+  vendor/franka_ros2:
+    type: git
+    url: https://github.com/frankarobotics/franka_ros2.git
+    version: v3.1.1
+  vendor/franka_description:
+    type: git
+    url: https://github.com/frankarobotics/franka_description.git
+    version: 2.1.0
+  vendor/libfranka:
+    type: git
+    url: https://github.com/frankarobotics/libfranka
+    version: 0.19.0

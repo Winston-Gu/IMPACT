@@ -1,0 +1,86 @@
+<mujoco model="fr3_scene">
+  <option cone="elliptic" impratio="10"/>
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3"
+             markrgb="0.8 0.8 0.8" width="300" height="300"/>
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2"/>
+    <texture name="table_wood_tex" type="2d" file="textures/wood1.png" />
+    <texture name="table_stone_tex" type="2d" file="textures/stone0.png" />
+    <texture name="metal_tex" type="2d" file="textures/metal2.png" />
+    <texture name="metal_tex_cube" type="2d" file="textures/metal1.png" />
+    <material name="table_wood_mat" texture="table_wood_tex" rgba="0.9 0.9 0.9 1" texuniform="true" texrepeat="2 2" reflectance="0.2"/>
+    <material name="table_stone_mat" texture="table_stone_tex" rgba="0.85 0.85 0.85 1" texuniform="true" texrepeat="2 2" reflectance="0.3"/>
+    <material name="pedestal_metal_mat" texture="metal_tex" rgba="0.85 0.85 0.85 1" texuniform="true" texrepeat="1 1" reflectance="0.4"/>
+    <material name="pedestal_metal_side_mat" texture="metal_tex" rgba="0.85 0.85 0.85 1" texuniform="true" texrepeat="6 12" reflectance="0.4"/>
+    <material name="cube_metal_mat" texture="metal_tex_cube" rgba="0.9 0.9 0.9 1" texuniform="true" texrepeat="2 2" reflectance="0.4"/>
+  </asset>
+  <include file="fr3_menagerie_torque_gripper.xml"/>
+
+  <worldbody>
+    <light pos="0 0 1.5" dir="0 0 -1" directional="true"/>
+    <geom name="floor" size="0 0 0.05" type="plane" material="groundplane"/>
+
+    <geom name="robot_pedestal_base" type="box" size="0.2 0.4 0.01" pos="0 0 0.01" material="pedestal_metal_mat"/>
+    <geom name="robot_pedestal_top" type="box" size="0.2 0.4 0.01" pos="0 0 0.29" material="pedestal_metal_mat"/>
+    <geom name="robot_pedestal_front" type="box" size="0.2 0.01 0.14" pos="0 0.39 0.15" material="pedestal_metal_side_mat"/>
+    <geom name="robot_pedestal_back" type="box" size="0.2 0.01 0.14" pos="0 -0.39 0.15" material="pedestal_metal_side_mat"/>
+    <geom name="robot_pedestal_left" type="box" size="0.01 0.4 0.14" pos="0.19 0 0.15" material="pedestal_metal_side_mat"/>
+    <geom name="robot_pedestal_right" type="box" size="0.01 0.4 0.14" pos="-0.19 0 0.15" material="pedestal_metal_side_mat"/>
+
+    <body name="table" pos="0.55 0 0.0">
+      <geom name="table_top" type="box" size="0.45 0.6 0.03" pos="0 0 0.5"
+            material="table_stone_mat" friction="1 0.1 0.001" condim="6"
+            solref="0.002 1" solimp="0.9 0.95 0.001 0.5 2"/>
+      <geom name="table_leg_fl" type="box" size="0.03 0.03 0.235" pos="0.35 0.55 0.235" material="table_stone_mat"/>
+      <geom name="table_leg_fr" type="box" size="0.03 0.03 0.235" pos="0.35 -0.55 0.235" material="table_stone_mat"/>
+      <geom name="table_leg_rl" type="box" size="0.03 0.03 0.235" pos="-0.35 0.55 0.235" material="table_stone_mat"/>
+      <geom name="table_leg_rr" type="box" size="0.03 0.03 0.235" pos="-0.35 -0.55 0.235" material="table_stone_mat"/>
+    </body>
+
+    <body name="pick_cube" pos="0.45 0.0 0.57">
+      <joint name="pick_cube_free" type="free"/>
+      <geom name="pick_cube_geom" type="box" size="0.02 0.02 0.02" material="cube_metal_mat"
+            mass="0.1" friction="4.0 1.0 0.001" condim="6"
+            solref="0.002 1" solimp="0.9 0.95 0.001 0.5 2"/>
+    </body>
+    <body name="pick_cube_anchor" mocap="true" pos="0.45 0.0 0.57"/>
+
+    <body name="target_basket" pos="0.65 0.2 0.53">
+      <joint name="target_basket_free" type="free"/>
+      <geom name="basket_base" type="box" size="0.08 0.08 0.005" material="table_wood_mat" mass="0.2"/>
+      <geom name="basket_wall_front" type="box" size="0.08 0.005 0.025" pos="0 0.075 0.03" material="table_wood_mat"/>
+      <geom name="basket_wall_back" type="box" size="0.08 0.005 0.025" pos="0 -0.075 0.03" material="table_wood_mat"/>
+      <geom name="basket_wall_left" type="box" size="0.005 0.08 0.025" pos="0.075 0 0.03" material="table_wood_mat"/>
+      <geom name="basket_wall_right" type="box" size="0.005 0.08 0.025" pos="-0.075 0 0.03" material="table_wood_mat"/>
+    </body>
+    <body name="target_basket_anchor" mocap="true" pos="0.65 0.2 0.53"/>
+
+    <camera name="front_camera" pos="1.5 0.0 1.1" quat="0.619272 0.341324 0.341324 0.619272" fovy="60"/>
+    <camera name="side_camera" pos="0.55 -1.1 1.1" quat="0.859899 0.510464 0.0 0.0" fovy="60"/>
+    <camera name="third_person_view" pos="1.2 -1.0 1.2" quat="0.832017 0.476413 0.141228 0.246643" fovy="60"/>
+  </worldbody>
+
+  <contact>
+    <pair geom1="fr3_leftfinger_collision" geom2="pick_cube_geom" solref="0.002 1"
+          solimp="0.95 0.99 0.001 0.5 2"/>
+    <pair geom1="fr3_rightfinger_collision" geom2="pick_cube_geom" solref="0.002 1"
+          solimp="0.95 0.99 0.001 0.5 2"/>
+  </contact>
+
+  <equality>
+    <weld name="pick_cube_anchor_weld" body1="pick_cube" body2="pick_cube_anchor"/>
+    <weld name="basket_anchor_weld" body1="target_basket" body2="target_basket_anchor"/>
+  </equality>
+
+  <keyframe>
+    <key name="home"
+         qpos="0 -0.785398 0 -2.35619 0 1.5708 0.785398 0 0 0.45 0 0.57 1 0 0 0 0.65 0.2 0.53 1 0 0 0"/>
+  </keyframe>
+</mujoco>

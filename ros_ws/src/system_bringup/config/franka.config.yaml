@@ -1,0 +1,23 @@
+FrankaRight: # Arbitrary identifier for the first robot (a Mnemonic)
+  arm_id: "fr3" # Reserved for future use, unique arm (i.e. robot model) identifier
+  arm_prefix: "" # Reserved for future use (e.g., robot unique prefix)
+  fake_sensor_commands: "false" # Enable fake sensor commands for simulation
+  joint_state_rate: 30 # Publishing rate for joint states (Hz)
+  load_gripper: "true" # Enable Franka Gripper ("true" or "false")
+  namespace: "fr3_right" # Namespace for robot, any string (empty string allowed - meaningful names recommended)
+  robot_ip: "172.16.0.2" # Robot’s IP address or hostname
+  urdf_file: "fr3/fr3.urdf.xacro" # Relative path to URDF in franka_description/robots
+  use_fake_hardware: "false" # Use simulated hardware ("true" or "false")
+  use_rviz: "false" # Launch RViz if "true" (single instance for all namespaces)
+
+# FrankaLeft:
+#   arm_id: "fr3"
+#   arm_prefix: ""
+#   fake_sensor_commands: "false"
+#   joint_state_rate: 30
+#   load_gripper: "true"
+#   namespace: "fr3_left"
+#   robot_ip: "172.16.10.2"
+#   urdf_file: "fr3/fr3.urdf.xacro"
+#   use_fake_hardware: "false"
+#   use_rviz: "false"

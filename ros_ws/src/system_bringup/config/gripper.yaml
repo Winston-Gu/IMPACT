@@ -1,0 +1,12 @@
+franka_gripper_bridge:
+  ros__parameters:
+    command_topic: "/gripper/gripper_position_controller/commands"
+    gripper_namespace: "/franka_gripper"
+    min_width: 0.0
+    max_width: 0.08
+    grasp_speed: 0.1
+    grasp_force: 200.0
+    grasp_epsilon_inner: 0.01
+    grasp_epsilon_outer: 0.08
+    hardware_joint_state_topic: ""
+    normalized_joint_state_topic: "/gripper/joint_states"

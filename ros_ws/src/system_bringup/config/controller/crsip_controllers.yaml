@@ -1,0 +1,302 @@
+/**:
+  controller_manager:
+    ros__parameters:
+      update_rate: 1000  # Hz
+      thread_priority: 98   # example
+      enable_overrun: false
+
+      joint_trajectory_controller:
+        type: joint_trajectory_controller/JointTrajectoryController
+
+      joint_state_broadcaster:
+        type: joint_state_broadcaster/JointStateBroadcaster
+
+      twist_broadcaster:
+        type: crisp_controllers/TwistBroadcaster
+
+      pose_broadcaster:
+        type: crisp_controllers/PoseBroadcaster
+
+      gravity_compensation:
+        type: crisp_controllers/CartesianController
+
+      cartesian_impedance_controller:
+        type: crisp_controllers/CartesianController
+
+      joint_impedance_controller:
+        type: crisp_controllers/CartesianController
+
+      # Not supported for now 251026
+
+      # external_torques_broadcaster:
+      #   type: franka_force_feedback_controllers/ExternalTorquesBroadcaster
+
+      # torque_feedback_controller:
+      #   type: crisp_controllers/TorqueFeedbackController
+
+      # By Official Franka Bringup
+
+      franka_robot_state_broadcaster:
+        type: franka_robot_state_broadcaster/FrankaRobotStateBroadcaster
+        state_interfaces:
+          robot_state
+
+  joint_trajectory_controller:
+    ros__parameters:
+      command_interfaces:
+        - effort
+      state_interfaces:
+        - position
+        - velocity
+      joints:
+        - fr3_joint1
+        - fr3_joint2
+        - fr3_joint3
+        - fr3_joint4
+        - fr3_joint5
+        - fr3_joint6
+        - fr3_joint7
+      gains:
+        fr3_joint1: { p: 600., d: 30., i: 0., i_clamp: 1. }
+        fr3_joint2: { p: 600., d: 30., i: 0., i_clamp: 1. }
+        fr3_joint3: { p: 600., d: 30., i: 0., i_clamp: 1. }
+        fr3_joint4: { p: 600., d: 30., i: 0., i_clamp: 1. }
+        fr3_joint5: { p: 250., d: 10., i: 0., i_clamp: 1. }
+        fr3_joint6: { p: 150., d: 10., i: 0., i_clamp: 1. }
+        fr3_joint7: { p: 50., d: 5., i: 0., i_clamp: 1. }
+
+  joint_state_broadcaster:
+    ros__parameters:
+      use_local_topics: False
+
+  twist_broadcaster:
+    ros__parameters:
+      joints:
+        - fr3_joint1
+        - fr3_joint2
+        - fr3_joint3
+        - fr3_joint4
+        - fr3_joint5
+        - fr3_joint6
+        - fr3_joint7
+
+      end_effector_frame: fr3_hand_tcp
+      base_frame: base
+
+  pose_broadcaster:
+    ros__parameters:
+      joints:
+        - fr3_joint1
+        - fr3_joint2
+        - fr3_joint3
+        - fr3_joint4
+        - fr3_joint5
+        - fr3_joint6
+        - fr3_joint7
+
+      end_effector_frame: fr3_hand
+      base_frame: fr3_link0
+
+  gravity_compensation:
+    ros__parameters:
+      joints:
+        - fr3_joint1
+        - fr3_joint2
+        - fr3_joint3
+        - fr3_joint4
+        - fr3_joint5
+        - fr3_joint6
+        - fr3_joint7
+
+      end_effector_frame: fr3_hand_tcp
+      base_frame: base
+
+      task:
+        k_pos_x: 0.0
+        k_pos_y: 0.0
+        k_pos_z: 0.0
+        k_rot_x: 30.0
+        k_rot_y: 30.0
+        k_rot_z: 30.0
+
+      nullspace:
+        stiffness: 0.0
+
+      use_friction: true
+      use_coriolis_compensation: true
+      use_local_jacobian: true
+
+  joint_impedance_controller:
+    ros__parameters:
+      joints:
+        - fr3_joint1
+        - fr3_joint2
+        - fr3_joint3
+        - fr3_joint4
+        - fr3_joint5
+        - fr3_joint6
+        - fr3_joint7
+
+      end_effector_frame: fr3_hand_tcp
+      base_frame: base
+
+      task:
+        k_pos_x: 0.0
+        k_pos_y: 0.0
+        k_pos_z: 0.0
+        k_rot_x: 0.0
+        k_rot_y: 0.0
+        k_rot_z: 0.0
+
+      max_delta_tau: 0.5
+
+      nullspace:
+        stiffness: 5.0
+        projector_type: none  # So we are directly controlling the joints!
+        damping: 0.5
+        max_tau: 5.0
+        regularization: 1.0e-06
+        weights:
+          fr3_joint1.value: 150.0
+          fr3_joint2.value: 150.0
+          fr3_joint3.value: 150.0
+          fr3_joint4.value: 150.0
+          fr3_joint5.value: 50.0
+          fr3_joint6.value: 30.0
+          fr3_joint7.value: 10.0
+
+      use_friction: true
+      use_coriolis_compensation: true
+      use_local_jacobian: true
+      limit_error: true
+      limit_torques: true
+
+
+  cartesian_impedance_controller:
+    ros__parameters:
+      joints:
+        - fr3_joint1
+        - fr3_joint2
+        - fr3_joint3
+        - fr3_joint4
+        - fr3_joint5
+        - fr3_joint6
+        - fr3_joint7
+
+      end_effector_frame: fr3_hand
+      base_frame: fr3_link0
+
+      filter:
+        q: 0.5
+        dq: 0.5
+        output_torque: 0.5
+
+      task:
+        k_pos_x: 400.0
+        k_pos_y: 400.0
+        k_pos_z: 400.0
+        k_rot_x: 30.0
+        k_rot_y: 30.0
+        k_rot_z: 30.0
+
+      nullspace:
+        stiffness: 2.0
+
+      # log:
+      #   enabled: true
+      #   computed_torques: true  # Log all torque components
+      #   timing: false
+
+      use_friction: false
+      use_coriolis_compensation: true
+      use_local_jacobian: true
+
+  predictive_controller:
+    ros__parameters:
+      joints:
+        - fr3_joint1
+        - fr3_joint2
+        - fr3_joint3
+        - fr3_joint4
+        - fr3_joint5
+        - fr3_joint6
+        - fr3_joint7
+
+      end_effector_frame: fr3_hand_tcp
+      base_frame: base
+
+      filter:
+        q: 0.5
+        dq: 0.5
+        output_torque: 0.5
+
+      task:
+        k_pos_x: 400.0
+        k_pos_y: 400.0
+        k_pos_z: 400.0
+        k_rot_x: 30.0
+        k_rot_y: 30.0
+        k_rot_z: 30.0
+
+      nullspace:
+        stiffness: 2.0
+
+      # Following parameters control the predictive behavior
+      predictive:
+        enabled: true
+        # Adaptive Stiffness Parameters
+        # translational:
+        #   initial_stiffness: 80.0
+        #   min_stiffness: 50.0
+        #   max_stiffness: 500.0
+        #   stiffness_step: 1.0
+        #   increase_error_threshold: 0.02
+        #   decrease_error_threshold: 0.005
+        #   smoothing_factor: 0.25
+        translational:
+          initial_stiffness: 200.0
+          min_stiffness: 200.0
+          max_stiffness: 200.0
+          stiffness_step: 1.0
+          increase_error_threshold: 1.0
+          decrease_error_threshold: 0.0
+          smoothing_factor: 0.25
+        feedforward:
+          enabled: true
+          force_increment: 3.0
+          max_force: 80.0
+          deadband: 0.001
+          leak_rate: 0.02
+          integration_delay_cycles: 300
+          steady_error_tolerance: 0.001
+      ########
+
+      use_friction: false
+      use_coriolis_compensation: true
+      use_local_jacobian: true
+
+  torque_feedback_controller:
+    ros__parameters:
+      joints:
+        - fr3_joint1
+        - fr3_joint2
+        - fr3_joint3
+        - fr3_joint4
+        - fr3_joint5
+        - fr3_joint6
+        - fr3_joint7
+
+      end_effector_frame: fr3_hand_tcp
+      base_frame: base
+
+      k_fb: 0.6
+      kd: 0.1
+      joint_source_topic: target_joint
+      torque_threshold: 0.1
+
+  franka_robot_state_broadcaster:
+    ros__parameters:
+      lock_try_count: 5 # Number of attempts to acquire the lock in a single on_update()
+      lock_sleep_interval: 5 # microseconds sleep between attempts
+      lock_log_error: true #  Log error if lock acquisition fails - false == do not log
+      lock_update_success: true # return update OK, although lock fails (no update occurs)

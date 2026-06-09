@@ -1,0 +1,21 @@
+/**:
+  gravity_compensation:
+    ros__parameters:
+      use_gravity_compensation: true
+
+  cartesian_impedance_controller:
+    ros__parameters:
+      use_gravity_compensation: true
+      limit_error: false
+
+  cerebellum_predictive_controller:
+    ros__parameters:
+      use_gravity_compensation: true
+      limit_error: false
+      cereb_bias_alpha_force: 2.0
+      cereb_bias_alpha_torque: 1.0
+      cereb_readings_noisy: false
+      observer_max_force: 120.0
+      observer_max_torque: 50.0
+      cereb_bias_max_force: 120.0
+      cereb_bias_max_torque: 50.0

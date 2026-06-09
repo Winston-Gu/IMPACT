@@ -1,0 +1,37 @@
+<library path="predictive_controller">
+    <class name="predictive_controller/NoopEffortController"
+           type="predictive_controller::NoopEffortController"
+           base_class_type="controller_interface::ControllerInterface">
+        <description>
+            Minimal controller that claims effort interfaces and writes zero commands.
+        </description>
+    </class>
+    <class name="predictive_controller/CartesianImpedanceController"
+           type="predictive_controller::CartesianImpedanceController"
+           base_class_type="controller_interface::ControllerInterface">
+        <description>
+            Cartesian impedance controller using pinocchio dynamics and target topics.
+        </description>
+    </class>
+    <class name="predictive_controller/ResidualObserverController"
+           type="predictive_controller::ResidualObserverController"
+           base_class_type="controller_interface::ControllerInterface">
+        <description>
+            Cartesian impedance controller with residual-based external wrench observer.
+        </description>
+    </class>
+    <class name="predictive_controller/CerebellumPredictiveController"
+           type="predictive_controller::CerebellumPredictiveController"
+           base_class_type="controller_interface::ControllerInterface">
+        <description>
+            Cartesian impedance controller with residual observer and cerebellum-style feedforward.
+        </description>
+    </class>
+    <class name="predictive_controller/PoseBroadcaster"
+           type="predictive_controller::PoseBroadcaster"
+           base_class_type="controller_interface::ControllerInterface">
+        <description>
+            Publishes current end-effector pose to current_pose.
+        </description>
+    </class>
+</library>

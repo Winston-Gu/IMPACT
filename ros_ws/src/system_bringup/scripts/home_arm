@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+# Command the Franka arm back to the default ready (home) configuration.
+# The script temporarily activates the trajectory controller, publishes
+# the home trajectory, waits for completion, then re-activates the Cartesian
+# impedance controller used by teleoperation.
+
+set -euo pipefail
+
+HOME_JOINTS="0.0, -0.785398, 0.0, -2.35619, 0.0, 1.5708, 0.785398"
+MOVE_DURATION_SEC=10
+NAMESPACE=""
+TRAJ_CONTROLLER="joint_trajectory_controller"
+CART_CONTROLLER="cartesian_impedance_controller"
+
+usage() {
+  cat <<EOF
+Usage: home_arm [--namespace NS] [--traj-controller NAME] [--cart-controller NAME] [--duration SEC]
+
+Options:
+  --namespace         Robot namespace (e.g., fr3_right). Default: empty (root namespace)
+  --traj-controller   Trajectory controller to activate. Default: joint_trajectory_controller
+  --cart-controller   Cartesian controller to re-activate. Default: cartesian_impedance_controller
+  --duration          Move duration in seconds. Default: 10
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --namespace)
+      NAMESPACE="${2:-}"
+      shift 2
+      ;;
+    --traj-controller)
+      TRAJ_CONTROLLER="${2:-}"
+      shift 2
+      ;;
+    --cart-controller)
+      CART_CONTROLLER="${2:-}"
+      shift 2
+      ;;
+    --duration)
+      MOVE_DURATION_SEC="${2:-}"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+if ! command -v ros2 >/dev/null 2>&1; then
+  echo "ros2 CLI not found in PATH. Did you source install/setup.bash?" >&2
+  exit 1
+fi
+
+if [[ -n "${NAMESPACE}" ]]; then
+  NS_PREFIX="/${NAMESPACE#/}"
+else
+  NS_PREFIX=""
+fi
+
+if ! ros2 control list_controllers --controller-manager "${NS_PREFIX}/controller_manager" | awk '{print $1}' | grep -qx "${TRAJ_CONTROLLER}"; then
+  echo "Loading ${TRAJ_CONTROLLER}..."
+  ros2 run controller_manager spawner "${TRAJ_CONTROLLER}" --inactive --ros-args -r __ns:="${NS_PREFIX}"
+fi
+
+echo "Switching controllers: activate ${TRAJ_CONTROLLER}, deactivate ${CART_CONTROLLER}..."
+ros2 control switch_controllers \
+  --controller-manager "${NS_PREFIX}/controller_manager" \
+  --activate "${TRAJ_CONTROLLER}" \
+  --deactivate "${CART_CONTROLLER}" \
+  --strict
+
+echo "Commanding Franka to home pose over ${MOVE_DURATION_SEC}s..."
+ros2 topic pub --once "${NS_PREFIX}/${TRAJ_CONTROLLER}/joint_trajectory" \
+  trajectory_msgs/msg/JointTrajectory "{
+  joint_names: [fr3_joint1, fr3_joint2, fr3_joint3, fr3_joint4, fr3_joint5, fr3_joint6, fr3_joint7],
+  points: [
+    {
+      positions: [${HOME_JOINTS}],
+      time_from_start: {sec: ${MOVE_DURATION_SEC}, nanosec: 0}
+    }
+  ]
+}"
+
+echo "Waiting ${MOVE_DURATION_SEC}s for the robot to reach the target..."
+sleep "${MOVE_DURATION_SEC}"
+
+echo "Restoring ${CART_CONTROLLER}..."
+ros2 control switch_controllers \
+  --controller-manager "${NS_PREFIX}/controller_manager" \
+  --activate "${CART_CONTROLLER}" \
+  --deactivate "${TRAJ_CONTROLLER}" \
+  --strict
+
+echo "Done."

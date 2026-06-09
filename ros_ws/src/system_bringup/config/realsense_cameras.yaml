@@ -1,0 +1,56 @@
+common_parameters:
+  camera_name: ""
+  enable_sync: true
+  publish_tf: false
+  publish_odom_tf: false
+  diagnostics_period: 0.0
+  pointcloud.enable: false
+  colorizer.enable: false
+  unite_imu_method: ""
+  enable_accel: false
+  enable_gyro: false
+  enable_infra1: false
+  enable_infra2: false
+  enable_depth: false
+  enable_color: true
+  rgb_camera.profile: "640x480x30"
+  depth_module.profile: "640x480x30"
+  align_depth.enable: true
+
+cameras:
+  - name: "front"
+    description: "Front RealSense camera"
+    camera_namespace: "camera"
+    camera_name: "front_camera"
+    node_name: "front_realsense"
+    serial_no: "247122073441"
+    camera_index: 0
+    camera_idx: 0
+    base_frame_id: "front_link"
+    color_frame_id: "front_color_optical_frame"
+    depth_frame_id: "front_depth_optical_frame"
+    parameters:
+      initial_reset: false
+      clip_distance: 0.0
+      crop_x: 0
+      crop_y: 0
+      crop_width: 0
+      crop_height: 0
+  - name: "side"
+    description: "Side RealSense camera"
+    camera_namespace: "camera"
+    camera_name: "side_camera"
+    node_name: "side_realsense"
+    serial_no: "242322073615"
+    camera_index: 0
+    camera_idx: 0
+    base_frame_id: "side_link"
+    color_frame_id: "side_color_optical_frame"
+    depth_frame_id: "side_depth_optical_frame"
+    parameters:
+      initial_reset: false
+      clip_distance: 0.0
+      crop_x: 0
+      crop_y: 0
+      crop_width: 0
+      crop_height: 0

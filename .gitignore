@@ -1,1 +1,40 @@
 .DS_Store
+
+# Editors and local environments
+.vscode/
+.idea/
+.env
+.env.*
+.venv/
+.venv_ros/
+venv/
+
+# Python caches
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+
+# ROS/colcon build products
+build/
+install/
+log/
+ros_ws/build/
+ros_ws/install/
+ros_ws/log/
+ros_ws/vendor/
+
+# Runtime outputs and generated data
+MUJOCO_LOG.TXT
+datasets/
+outputs/
+logs/
+wandb/
+*.bag
+*.db3
+*.mcap
+
+# Local scratch/reference code
+ZLegacy/

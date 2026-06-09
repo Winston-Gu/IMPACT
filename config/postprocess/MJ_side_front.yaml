@@ -1,0 +1,79 @@
+align:
+  # Defaults applied to every channel unless overridden.
+  target_frequency_hz: 30
+
+  defaults:
+    strategy: nearest          # hold | nearest | future
+    required: true
+    max_time_diff_ms: 50       # Reject samples farther than this from the target timestamp.
+    allow_future: true
+
+  # Only the listed channels will be included in the processed dataset.
+  # If omitted, every key found in the raw pickle will be included.
+  channels:
+    - key: command/target_pose
+      max_time_diff_ms: 100
+    - key: robot/current_pose
+      max_time_diff_ms: 50
+    - key: robot/joint_states
+      strategy: hold
+      max_time_diff_ms: 50
+    - key: gripper/joint_states
+      max_time_diff_ms: 100
+      strategy: hold
+    - key: gripper/command
+      max_time_diff_ms: null    # allow initial hold to persist until first real command
+      strategy: hold
+      initial_value: {data: [1.0]}
+    - key: cameras/0/color_image
+      required: false
+      max_time_diff_ms: 120
+    - key: cameras/1/color_image
+      required: false
+      max_time_diff_ms: 120
+
+export:
+  transforms:
+    - name: cartesian_pose
+      key: robot/current_pose
+      transform: pose
+    - name: joint_position
+      key: robot/joint_states
+      transform: joint_position
+    # - name: joint_state
+    #   key: robot/joint_states
+    #   transform: joint_state
+    #   include_velocity: true
+    #   include_effort: false
+    - name: gripper_state
+      key: gripper/joint_states
+      transform: gripper_state
+    - name: front_camera_image
+      key: cameras/0/color_image
+      transform: image_compressed
+      convert_to_rgb: true
+
+    - name: side_camera_image
+      key: cameras/1/color_image
+      transform: image_compressed
+      convert_to_rgb: true
+
+    - name: target_pose
+      key: command/target_pose
+      transform: pose
+      delta_with: cartesian_pose
+      delta_indices: [0, 1, 2]
+    - name: gripper_command
+      key: gripper/command
+      transform: float_array
+
+  observations:
+    - name: proprioception
+      keys: ["cartesian_pose", "joint_position", "gripper_state"]
+    - name: front_camera
+      keys: ["front_camera_image"]
+    - name: side_camera
+      keys: ["side_camera_image"]
+  actions:
+    - name: actions
+      keys: ["target_pose", "gripper_command"]

@@ -1,0 +1,61 @@
+mode: "single"
+default_side: "right"
+base_frame: "fr3_link0"
+
+joycon_mapping:
+  right: fr3_right
+  left: fr3_left
+
+joycon_single_teleop_node:
+  ros__parameters:
+    publish_rate: 50.0
+    world_frame: "fr3_link0"
+    stick_velocity_scale: 0.1
+    button_velocity_scale: 0.1
+    position_limits: [1.0, 1.0, 1.0]
+    joycon_side: "right"
+    wait_for_connection: true
+    auto_reconnect: true
+    connection_timeout: 10.0
+    retry_interval: 2.0
+
+dataset_recorder:
+  ros__parameters:
+    dataset_name: "Test"
+    output_root: "datasets/raw"
+    autostart: false
+    enable_keyboard_shortcuts: true
+    queue_size: 10
+
+    # Single Right Robot Teleoperation
+    metadata_tags: ["teleop:joycon_single", "robot:fr3_right", "sensors:realsense_front"]
+    topics:
+      - "/fr3_right/target_pose"
+      - "/fr3_right/current_pose"
+      - "/fr3_right/franka/joint_states"
+      - "/fr3_right/gripper/joint_states"
+      - "/fr3_right/gripper/gripper_position_controller/commands"
+      - "/camera/front_camera/color/image_rect_raw/compressed"
+      - "/camera/front_camera/color/camera_info"
+      - "/camera/side_camera/color/image_rect_raw/compressed"
+      - "/camera/side_camera/color/camera_info"
+    topic_types:
+      - "geometry_msgs/msg/PoseStamped"
+      - "geometry_msgs/msg/PoseStamped"
+      - "sensor_msgs/msg/JointState"
+      - "sensor_msgs/msg/JointState"
+      - "std_msgs/msg/Float64MultiArray"
+      - "sensor_msgs/msg/CompressedImage"
+      - "sensor_msgs/msg/CameraInfo"
+      - "sensor_msgs/msg/CompressedImage"
+      - "sensor_msgs/msg/CameraInfo"
+    topic_aliases:
+      - "command/target_pose"
+      - "robot/current_pose"
+      - "robot/joint_states"
+      - "gripper/joint_states"
+      - "gripper/command"
+      - "cameras/0/color_image"
+      - "cameras/0/camera_info"
+      - "cameras/1/color_image"
+      - "cameras/1/camera_info"
