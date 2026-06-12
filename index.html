@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="static/css/index.css">
 
   <link rel="icon" type="image/x-icon" href="static/images/IMPACT.ico">
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
   <script src="https://webtracking.gao-jiawei.com/api/script.js" data-site-id="2410a3f24934" defer></script>
 </head>
 <body>
@@ -30,14 +31,14 @@
         <h2 class="subtitle">Learning Internal-Model Predictive Control <br> for Forceful Robotic Manipulation</h2>
 
         <div class="cta-row mono-link-text">
-          <a href="https://arxiv.org/abs/2406.14558v2" target="_blank" rel="noopener noreferrer" class="cta-btn">
+          <a href="https://arxiv.org/abs/2606.10818" target="_blank" rel="noopener noreferrer" class="cta-btn">
             <i class="ai ai-arxiv" aria-hidden="true"></i> arXiv
           </a>
           <a href="https://www.youtube.com/watch?v=kboJsLPIrYI" target="_blank" rel="noopener noreferrer" class="cta-btn">
             <i class="fab fa-youtube" aria-hidden="true"></i> Video
           </a>
           <a href="https://github.com/Winston-Gu/IMPACT" target="_blank" rel="noopener noreferrer" class="cta-btn">
-            <i class="fab fa-github" aria-hidden="true"></i> Code (Coming Soon!)
+            <i class="fab fa-github" aria-hidden="true"></i> Code
           </a>
         </div>
 
@@ -76,7 +77,7 @@
         <article class="briefing-item">
           <h3>Why It Matters</h3>
           <p>Everyday household tasks often involve significant interaction forces. 
-            To finish the tasks successfully, imitation learning policies must adapt to varying contact dynamics—such as adjusting vertical lift force to compensate for an object's weight. 
+            To finish the tasks, imitation learning policies must adapt to varying contact dynamics—such as adjusting vertical lift force to compensate for an object's weight. 
             Our research shows that vanilla imitation learning with impedance control fails to generalize to these gravitational loads, leading to task failure even as training data scales.</p>
         </article>
         <article class="briefing-item">
@@ -96,14 +97,14 @@
         <p class="overview-center-copy">
           The core idea of <strong>IMPACT</strong> is to combine an imitation learning policy with an online-updated internal model of environment dynamics and contact forces. 
           Consider the case when we want the robots to handle objects of varying weights. 
-          To compensate for the object gravity, the policy will need to learn to overshoot in z direction during the lift phase, as illustrated in Fig 1. 
+          To compensate for the object gravity, the policy will need to learn to overshoot in \(z\) direction during the lift phase, as illustrated in Fig 1.
           Experiments shows that this vanilla appraoch fail to adapt and achieve successful task completion, even with more training data.
         </p>
         <p class="overview-center-copy">
           In contrast, we propose to decouple 
         </p>
         <figure class="overview-figure">
-          <img src="./resources/Methods.svg" alt="IMPACT methods figure">
+          <img src="./resources/Pipeline.png" alt="IMPACT methods figure">
           <figcaption>Fig 1. Overview of IMPACT and comparison with implicit force control method. (a) In implicit force control, forces are generated implicitly by the policy through producing virtual target trajectories that induce tracking errors, which are converted into interaction forces by a low-level impedance controller. (b) In IMPACT, the controller generates desired interaction forces: an internal model predicts contact and payload-induced forces and compensates via feedforward torque commands. </figcaption>
         </figure>
       </div>
