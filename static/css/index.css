@@ -274,8 +274,13 @@ main.shell {
 .overview-section h1 {
   margin: 0;
   font-family: "Cormorant Garamond", "Times New Roman", serif;
-  font-size: 2.05rem;
+  font-size: 2.75rem;
   font-weight: 600;
+  line-height: 1.05;
+}
+
+.overview-center-copy + h1 {
+  margin-top: 2.6rem;
 }
 
 .overview-intro {
@@ -289,14 +294,6 @@ main.shell {
   margin-top: 1rem;
 }
 
-.overview-block h2 {
-  margin: 0;
-  font-family: "Cormorant Garamond", "Times New Roman", serif;
-  font-size: 1.58rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-}
-
 .overview-block p {
   margin: 0.45rem 0 0.75rem;
   color: var(--ink-soft);
@@ -306,7 +303,6 @@ main.shell {
 }
 
 .overview-section h1,
-.overview-section .overview-block h2,
 .overview-section .overview-center-copy,
 .overview-split {
   max-width: 800px;
@@ -314,11 +310,16 @@ main.shell {
   margin-right: auto;
 }
 
-.demos-section h1,
-.demos-section .demos-intro,
 .results-demos,
 .demos-grid {
   max-width: 56rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.demos-section h1,
+.demos-section .demos-intro {
+  max-width: 800px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -352,18 +353,15 @@ main.shell {
 }
 
 .overview-split {
-  margin-top: 1rem;
-  display: grid;
-  grid-template-columns: 7fr 3fr;
-  gap: 1rem;
-  align-items: start;
+  margin-top: 0.25rem;
+  display: block;
 }
 
 .overview-split-text p {
-  margin: 0 0 0.7rem;
+  margin: 0.45rem 0 0.75rem;
   color: var(--ink-soft);
-  line-height: 1.72;
-  font-size: 0.98rem;
+  line-height: 1.75;
+  font-size: 1rem;
 }
 
 .overview-split-text p:last-child {
@@ -371,7 +369,8 @@ main.shell {
 }
 
 .overview-figure-half {
-  width: 100%;
+  width: min(100%, 560px);
+  margin: 1.1rem auto 1.8rem;
 }
 
 .overview-figure-half img {
@@ -381,6 +380,7 @@ main.shell {
 
 .overview-figure-half figcaption {
   width: 100%;
+  font-size: 0.8rem;
 }
 
 .results-demos {
@@ -431,20 +431,27 @@ main.shell {
 }
 
 .demos-section {
-  margin-top: 2rem;
-  padding-top: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 0;
 }
 
 .demos-section h1 {
   margin: 0 auto;
   font-family: "Cormorant Garamond", "Times New Roman", serif;
-  font-size: 2.25rem;
+  font-size: 2.75rem;
   font-weight: 600;
+  line-height: 1.05;
 }
 
 .demos-intro {
-  margin: 0.45rem auto 1rem;
+  margin: 0.45rem auto 0.75rem;
   color: var(--ink-soft);
+  line-height: 1.75;
+  font-size: 1rem;
+}
+
+.demos-intro + .demos-intro {
+  margin-top: 0;
 }
 
 .demos-grid {
@@ -480,6 +487,53 @@ main.shell {
   background: #111;
   border: 1px solid rgba(17, 17, 17, 0.45);
   box-shadow: 0 10px 26px rgba(17, 17, 17, 0.14);
+}
+
+.citation {
+  font-size: 0.7em;
+  line-height: 0;
+  vertical-align: super;
+}
+
+.citation a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.citation a:hover,
+.refs-list a:hover {
+  text-decoration: underline;
+}
+
+.refs-section {
+  margin-top: 2.5rem;
+}
+
+.refs-section h1 {
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: "Cormorant Garamond", "Times New Roman", serif;
+  font-size: 2.75rem;
+  font-weight: 600;
+  line-height: 1.05;
+}
+
+.refs-list {
+  max-width: 800px;
+  margin: 0.75rem auto 0;
+  padding-left: 1.25rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  font-size: 0.92rem;
+}
+
+.refs-list li {
+  margin-bottom: 0.7rem;
+}
+
+.refs-list a {
+  color: var(--accent);
+  text-decoration: none;
 }
 
 .footer {

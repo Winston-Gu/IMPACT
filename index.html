@@ -90,18 +90,35 @@
     </section>
 
     <section class="overview-section reveal">
-      <h1>Overview</h1>
-
       <div class="overview-block">
-        <h2>Methods</h2>
         <p class="overview-center-copy">
-          The core idea of <strong>IMPACT</strong> is to combine an imitation learning policy with an online-updated internal model of environment dynamics and contact forces. 
-          Consider the case when we want the robots to handle objects of varying weights. 
-          To compensate for the object gravity, the policy will need to learn to overshoot in \(z\) direction during the lift phase, as illustrated in Fig 1.
-          Experiments shows that this vanilla appraoch fail to adapt and achieve successful task completion, even with more training data.
+          Everyday household tasks often involve significant interaction forces.
+          Imagine, to lift objetcs, we need to apply upward forces that counteract objetcts' gravity;
+          to open a heavy door, we need to push with enough force to overcome the door's inertia and friction;
+          to wipe and clean the table, we need to apply downward forces to maintain contact and adjust them based on the surface texture and cleaning tool.
+          To make general purpose robotic foundation models capable of performing these tasks,
+          we need learning-based systems that can reason about the environment dyanmics, adapt to different scenarios, and modulate interaction forces accordingly.
         </p>
         <p class="overview-center-copy">
-          In contrast, we propose to decouple 
+        However, this is not trivial for current imitation learning systems, where a high-level policy is trained to mimic end-effector trajectories from demonstrations, and a low-level impedance controller tracks those trajectories while generating interaction forces implicitly from tracking errors.
+        Take the example of lifting objects of different weights:
+        for a light object, the demonstrated trajectory may require only a small upward force to counteract gravity, and the policy only need to mimic the demonstrated end-effector trajectory.
+        But for a heavier object, the required upward force is larger, and the policy would need to produce a steady end-effector tracking error to generate enough interaction force for the low level impedance controller.
+        However, this formulation couples the task-level motion planning and dynamics-level force interaction,
+        which makes it difficult for the policy to learn, and also leads to poor generalization when environment dynamics change.
+        </p>
+        <p class="overview-center-copy">
+        We propose <strong>IMPACT</strong>, a framework that decouples task-level motion planning and dynamics-level force interaction by learning an internal model of environment dynamics and contact interactions <em>online</em>.
+        A high-level imitation learning policy is trained to mimic the demonstrated end-effector trajectories, while we introduce an internal model that runs 1000Hz inside the control loop to predict contact- and payload-induced forces and compensate for them through feedforward torque commands.
+        Experiments in simulation and on a real Franka robot across lifting, disturbance compensation, and hybrid position-force tasks show that IMPACT achieves higher success rates under changing payloads, improved generalization to unseen object weights, and better safety and energy efficiency than implicit force-control baselines.
+        </p>
+
+        <h1>Methods</h1>
+        <p class="overview-center-copy">
+          IMPACT decouples task-level motion planning and dynamics-level force interaction commands.
+          The high-level imitation learning policy <sup class="citation"><a href="#ref-diffusion-policy">[1]</a></sup>.
+          During execution, the internal model predicts payload- and contact-induced forces before the slow force estimate has fully converged.
+          The controller then compensates for those predictable forces through feedforward torque commands, while retaining compliant feedback behavior for transient contact events.
         </p>
         <figure class="overview-figure">
           <img src="./resources/Pipeline.png" alt="IMPACT methods figure">
@@ -111,17 +128,22 @@
 
       <div class="overview-split">
           <div class="overview-split-text">
-            <p>The control diagram.</p>
+            <p>IMPACT's control loop keeps the learned policy focused on task intent and lets the internal model handle predictable force compensation.
+              This mirrors the role of an internal dynamics model in motor learning: repeated interaction improves the prediction of persistent disturbances, which can then be counteracted earlier and more smoothly.</p>
           </div>
           <figure class="overview-figure overview-figure-half">
             <img src="./resources/Diagram.svg" alt="IMPACT analysis diagram">
             <figcaption>Fig 3. Diagram of interaction behavior and control response.</figcaption>
           </figure>
         </div>
+    </section>
 
+    <section class="overview-section reveal">
       <div class="overview-block">
-        <h2>Results</h2>
-        <p class="overview-center-copy">The results highlight stronger robustness in force-sensitive scenarios where vanilla imitation learning with impedance control struggles. IMPACT maintains better task completion under shifts in interaction force and gravitational load.</p>
+        <h1>Results</h1>
+        <p class="overview-center-copy">IMPACT is evaluated in simulation and on a real Franka robot across lifting, disturbance compensation, and hybrid position-force tasks.
+          The results show higher success rates under changing payloads, improved generalization to unseen object weights, and better safety and energy efficiency than implicit force-control baselines.</p>
+        <p class="overview-center-copy">The qualitative videos below highlight the same trend: when force demands shift, IMPACT adapts through predictive compensation instead of relying on the policy to encode every possible force response in the demonstrated trajectory.</p>
         <figure class="overview-figure">
           <img src="./resources/SR_3d.svg" alt="IMPACT results figure">
           <figcaption>Fig 2. Results and qualitative analysis.</figcaption>
@@ -129,25 +151,25 @@
 
         <div class="results-demos">
           <article class="result-demo card">
-            <h3>IMPACT Generalize</h3>
+            <h3>Generalization to unseen object weights.</h3>
             <video controls playsinline preload="metadata">
               <source src="./resources/IMPACT Generalize.web.mp4" type="video/mp4">
             </video>
           </article>
           <article class="result-demo card">
-            <h3>Safe</h3>
+            <h3>Safe compliant behavior during forceful interaction.</h3>
             <video controls playsinline preload="metadata">
               <source src="./resources/Safe.web.mp4" type="video/mp4">
             </video>
           </article>
           <article class="result-demo result-demo-portrait card">
-            <h3>Calligraphy Large</h3>
+            <h3>Hybrid position-force control for large calligraphy strokes.</h3>
             <video controls playsinline preload="metadata">
               <source src="./resources/Caliggraphy_Large.web.mp4" type="video/mp4">
             </video>
           </article>
           <article class="result-demo result-demo-portrait card">
-            <h3>Calligraphy Small</h3>
+            <h3>Fine contact modulation for smaller calligraphy strokes.</h3>
             <video controls playsinline preload="metadata">
               <source src="./resources/Caliggraphy_Small.web.mp4" type="video/mp4">
             </video>
@@ -157,41 +179,42 @@
     </section>
 
     <section class="demos-section reveal">
-      <h1>Demos</h1>
-      <p class="demos-intro">Compressed web-ready demos for fast loading and playback.</p>
+      <h1>Analysis</h1>
+      <p class="demos-intro">These videos provide a closer look at baseline behavior, failure modes, and controller adaptation across different payload and contact conditions. The baseline clips show how policies that rely on implicit force generation can succeed in easier settings but become brittle when the required compensation changes.</p>
+      <p class="demos-intro">The controller clips focus on the role of the online internal model. As repeated interaction reveals persistent force disturbances, IMPACT learns to anticipate them and applies feedforward compensation earlier, producing smoother and more reliable forceful behavior.</p>
       <div class="demos-grid">
         <article class="demo-card card">
-          <h3>Baseline Light</h3>
+          <h3>Baseline with a light object: implicit force control can complete easier payload settings.</h3>
           <video controls playsinline preload="metadata">
             <source src="./resources/Baseline Light.web.mp4" type="video/mp4">
           </video>
         </article>
         <article class="demo-card card">
-          <h3>Baseline Heavy</h3>
+          <h3>Baseline with a heavier object: larger unmodeled forces expose poor generalization.</h3>
           <video controls playsinline preload="metadata">
             <source src="./resources/Basline Heavy.web.mp4" type="video/mp4">
           </video>
         </article>
         <article class="demo-card card">
-          <h3>Dumbbell Baseline</h3>
+          <h3>Dumbbell baseline: payload variation changes the force profile needed for stable lifting.</h3>
           <video controls playsinline preload="metadata">
             <source src="./resources/Dumbell Baseline.web.mp4" type="video/mp4">
           </video>
         </article>
         <article class="demo-card card">
-          <h3>Controller Baseline</h3>
+          <h3>Controller baseline: feedback alone reacts after force error appears.</h3>
           <video controls playsinline preload="metadata">
             <source src="./resources/Controller Baseline.web.mp4" type="video/mp4">
           </video>
         </article>
         <article class="demo-card card">
-          <h3>Controller Adapt</h3>
+          <h3>Controller adaptation: the internal model learns persistent interaction forces online.</h3>
           <video controls playsinline preload="metadata">
             <source src="./resources/Controller Adapt.web.mp4" type="video/mp4">
           </video>
         </article>
         <article class="demo-card card">
-          <h3>Controller Teleop</h3>
+          <h3>Controller teleoperation: predictive compensation transfers to human-guided interaction.</h3>
           <video controls playsinline preload="metadata">
             <source src="./resources/Controller Teleop.web.mp4" type="video/mp4">
           </video>
@@ -199,6 +222,17 @@
       </div>
     </section>
   </main>
+
+  <section class="shell refs-section reveal" id="refs">
+    <h1>Ref</h1>
+    <ol class="refs-list">
+      <li id="ref-diffusion-policy">
+        Cheng Chi, Zhenjia Xu, Siyuan Feng, Eric Cousineau, Yilun Du, Benjamin Burchfiel, Russ Tedrake, and Shuran Song.
+        <a href="https://arxiv.org/abs/2303.04137" target="_blank" rel="noopener noreferrer">Diffusion Policy: Visuomotor Policy Learning via Action Diffusion</a>.
+        arXiv:2303.04137, 2023.
+      </li>
+    </ol>
+  </section>
 
   <footer class="shell footer">
     <p>Website template adapted from <a href="https://gao-jiawei.com/CooHOI/" target="_blank" rel="noopener noreferrer">CooHOI</a> and <a href="https://nerfies.github.io/" target="_blank" rel="noopener noreferrer">NeRFies</a>.</p>
